@@ -4,20 +4,20 @@ nextflow.enable.dsl = 2
 
 /**
 ===============================
-BEMEPRI Pipeline - Benchmarking metabarcoding primers
+barbeque Pipeline - Benchmarking metabarcoding primers
 ===============================
 
 This Pipeline performs benchmarking of metabarcoding primers
 
 ### Homepage / git
-git@github.com:marchoeppner/bemepri.git
+git@github.com:marchoeppner/barbeque.git
 
 **/
 
 // Pipeline version
 params.version = workflow.manifest.version
 
-include { BEMEPRI }             from './workflows/bemepri'
+include { BARBEQUE }            from './workflows/barbeque'
 include { BUILD_REFERENCES }    from './workflows/build_references'
 include { paramsSummaryLog }    from 'plugin/nf-schema'
 
@@ -39,8 +39,8 @@ workflow {
     if (params.build_references) {
         BUILD_REFERENCES()
     } else {
-        BEMEPRI()
-        multiqc_report = multiqc_report.mix(BEMEPRI.out.qc).toList()
+        BARBEQUE()
+        multiqc_report = multiqc_report.mix(BARBEQUE.out.qc).toList()
     }
     
     def emailFields = [:]

@@ -1,4 +1,6 @@
-# Pipeline
+# BarBeQuE - BARcode BEnchmarking and QUality Evaluation 
+
+This pipelines takes sets of PCR primers for metabarcoding and benchmarks their performance against one or several reference databases. 
 
 ## Documentation 
 

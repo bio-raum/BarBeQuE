@@ -63,7 +63,7 @@ The `-r` option specifies a github [release tag](https://github.com/marchoeppner
 
 This pipeline expects a samplesheet with information on one or several primer sets for benchmarking. The format is a somple tab-delimited text file (.tsv):
 
-```tsv
+```TSV
 sample  FWD REV min max
 dobrovolny  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
 ```
@@ -73,9 +73,13 @@ dobrovolny  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
 A list of one or several pre-installed databases to benchmark against. If multiple databases are requested, they have to be separated by a comma
 
 ```bash
-nextflow run marchoeppner/bemepri --input primers.tsv --dbs midori_lrrna,midori_cytb ...
+nextflow run marchoeppner/barbeque --input primers.tsv --dbs midori_lrrna,midori_cytb ...
 ```
 
 ### `--run_name` [default = null]
 
 A descriptive name for this analysis run. Should be a single workd without special characters or white spaces  (i.e. my_analysis_run_01). 
+
+### `--list_dbs` [default=null]
+
+List all pre-installed databases and exit. 

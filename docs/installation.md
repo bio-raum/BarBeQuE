@@ -4,7 +4,7 @@
 
 Nextflow is a highly portable pipeline engine. Please see the official [installation guide](https://www.nextflow.io/docs/latest/getstarted.html#installation) to learn how to set it up.
 
-This pipeline expects Nextflow version 23.10.1, available [here](https://github.com/nextflow-io/nextflow/releases/tag/v23.10.1).
+This pipeline expects Nextflow version 24.10.8, available [here](https://github.com/nextflow-io/nextflow/releases/tag/v24.10.8).
 
 ## Software provisioning
 
@@ -29,7 +29,7 @@ The pipeline comes with simple pre-set profiles for all of these as described [h
 This pipeline requires locally stored genomes in fasta format. To build these, do:
 
 ```
-nextflow run marchoeppner/THIS_PIPELINE -profile singularity \\
+nextflow run marchoeppner/barbeque -profile singularity \\
 --build_references \\
 --run_name build_refs \\
 --outdir /path/to/references
@@ -45,4 +45,4 @@ The path specified with `--outdir` can then be given to the pipeline during norm
 
 If you run on anything other than a local system, this pipeline requires a site-specific configuration file to be able to talk to your cluster or compute infrastructure. Nextflow supports a wide range of such infrastructures, including Slurm, LSF and SGE - but also Kubernetes and AWS. For more information, see [here](https://www.nextflow.io/docs/latest/executor.html).
 
-Site-specific config-files for our pipeline ecosystem are stored centrally on [github](https://github.com/marchoeppner/nf-configs). Please talk to us if you want to add your system.
+Site-specific config-files for our pipeline ecosystem are stored centrally on [github](https://github.com/bio-raum/nf-configs). Please talk to us if you want to add your system.

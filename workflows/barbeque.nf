@@ -6,7 +6,7 @@ include { CRABS_INSILICOPCR }           from './../modules/crabs/insilico_pcr'
 include { CRABS_DEREPLICATE }           from './../modules/crabs/dereplicate'
 include { CRABS_FILTER }                from './../modules/crabs/filter'
 
-workflow BEMEPRI {
+workflow BARBEQUE {
 
     main:
 
@@ -42,7 +42,7 @@ workflow BEMEPRI {
     INPUT_CHECK(samplesheet)
 
     /*
-     Combine each primer set with all requested database
+     Combine each primer set with all requested databases
      [ meta, database_meta, database_path ]
     */
 
@@ -59,19 +59,17 @@ workflow BEMEPRI {
         ]
     }.set { ch_primers_with_db }
 
-    ch_primers_with_db.view()
-
-    // perform insilico pcr
+    // perform insilico pcr, takes: [meta, database]
     CRABS_INSILICOPCR(
         ch_primers_with_db
     )
 
-    // dereplicate in-silico amplicons
+    // dereplicate in-silico amplicons, takes [meta, txt]
     CRABS_DEREPLICATE(
         CRABS_INSILICOPCR.out.txt
     )
 
-    // Filter hits
+    // Filter hits, takes [meta, txt]
     CRABS_FILTER(
         CRABS_DEREPLICATE.out.txt
     )
