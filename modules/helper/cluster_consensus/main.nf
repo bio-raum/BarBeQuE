@@ -11,7 +11,7 @@ process HELPER_CLUSTER_CONSENSUS {
     path(taxdump)
 
     output:
-    tuple val(meta), path('*.consensus.json')   , emit: json
+    tuple val(meta), path('*.consensus.txt')    , emit: txt
     path 'versions.yml'                         , emit: versions
 
     script:

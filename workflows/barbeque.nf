@@ -67,28 +67,33 @@ workflow BARBEQUE {
     CRABS_INSILICOPCR(
         ch_primers_with_db
     )
+    ch_versions = ch_versions.mix(CRABS_INSILICOPCR.out.versions)
 
     // dereplicate in-silico amplicons, takes [meta, txt]
     CRABS_DEREPLICATE(
         CRABS_INSILICOPCR.out.txt
     )
+    ch_versions = ch_versions.mix(CRABS_DEREPLICATE.out.versions)
 
     // Filter hits, takes [meta, txt]
     CRABS_FILTER(
         CRABS_DEREPLICATE.out.txt
     )
+    ch_versions = ch_versions.mix(CRABS_FILTER.out.versions)
 
     // fast clustering of crabs OTUs
     VSEARCH_CLUSTER_FAST(
         CRABS_FILTER.out.fasta
     )
+    ch_versions = ch_versions.mix(VSEARCH_CLUSTER_FAST.out.versions)
 
     // Cluster consensus
     HELPER_CLUSTER_CONSENSUS(
         VSEARCH_CLUSTER_FAST.out.uc.join(CRABS_FILTER.out.txt),
         ch_taxdump
     )
-
+    ch_versions = ch_versions.mix(HELPER_CLUSTER_CONSENSUS.out.versions)
+    
     CUSTOM_DUMPSOFTWAREVERSIONS(
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )

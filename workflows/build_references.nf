@@ -16,11 +16,15 @@ workflow BUILD_REFERENCES {
 
     ch_midori_dbs = Channel.from([])
 
-    taxdump = file(params.references.taxdump_url, checkIfExists: true)
+    taxdump = Channel.fromPath(file(params.references.taxdump_url, checkIfExists: true))
 
     // Untar the downloaded taxdump archive
     UNTAR_TAXDUMP(
-        taxdump
+        taxdump.map { f ->
+            def meta = [:]
+            meta.id = f.getSimpleName()
+            tuple(meta, f)
+        }
     )
 
     // Download the NCBI taxonomy
