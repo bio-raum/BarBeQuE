@@ -9,7 +9,7 @@ include { CRABS_SUBSET }                from './../modules/crabs/subset'
 include { CRABS_DIVERSITY_FIGURE }      from './../modules/crabs/diversity_figure'
 include { VSEARCH_CLUSTER_FAST }        from './../modules/vsearch/cluster_fast'
 include { CRABS_AMPLIFICATION_EFFICENCY_FIGURE } from './../modules/crabs/amplification_efficency_figure'
-
+include { CRABS_AMPLICON_LENGTH_FIGURE }from './../modules/crabs/amplicon_length_figure'
 include { HELPER_CLUSTER_CONSENSUS }    from './../modules/helper/cluster_consensus'
 
 workflow BARBEQUE {
@@ -102,11 +102,18 @@ workflow BARBEQUE {
     // If a taxon is provided, perform additional visualisation/filtering
     if (params.taxon) {
 
+        // Generate a subset based on the --taxon argument
         CRABS_SUBSET(
             CRABS_FILTER.out.txt,
             params.taxon
         )
         
+        // Visualize the length distribution of putative amplicons
+        CRABS_AMPLICON_LENGTH_FIGURE(
+            CRABS_SUBSET.out.txt
+        )
+
+        // Visualize diversity of amplicons
         CRABS_DIVERSITY_FIGURE(
             CRABS_SUBSET.out.txt
         )
@@ -122,6 +129,7 @@ workflow BARBEQUE {
             tuple(m,s,d)
         }.set { ch_amplicons_with_db }
 
+        // visualize amplification efficency
         CRABS_AMPLIFICATION_EFFICENCY_FIGURE(
             ch_amplicons_with_db,
             params.taxon
