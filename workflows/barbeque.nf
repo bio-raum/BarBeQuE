@@ -5,8 +5,13 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareve
 include { CRABS_INSILICOPCR }           from './../modules/crabs/insilico_pcr'
 include { CRABS_DEREPLICATE }           from './../modules/crabs/dereplicate'
 include { CRABS_FILTER }                from './../modules/crabs/filter'
+include { CRABS_SUBSET }                from './../modules/crabs/subset'
+include { CRABS_DIVERSITY_FIGURE }      from './../modules/crabs/diversity_figure'
 include { VSEARCH_CLUSTER_FAST }        from './../modules/vsearch/cluster_fast'
+include { CRABS_AMPLIFICATION_EFFICENCY_FIGURE } from './../modules/crabs/amplification_efficency_figure'
+
 include { HELPER_CLUSTER_CONSENSUS }    from './../modules/helper/cluster_consensus'
+
 workflow BARBEQUE {
 
     main:
@@ -93,7 +98,36 @@ workflow BARBEQUE {
         ch_taxdump
     )
     ch_versions = ch_versions.mix(HELPER_CLUSTER_CONSENSUS.out.versions)
-    
+
+    // If a taxon is provided, perform additional visualisation/filtering
+    if (params.taxon) {
+
+        CRABS_SUBSET(
+            CRABS_FILTER.out.txt,
+            params.taxon
+        )
+        
+        CRABS_DIVERSITY_FIGURE(
+            CRABS_SUBSET.out.txt
+        )
+
+        // Combine each subset with the correct database
+        CRABS_SUBSET.out.txt.map {m, s ->
+            tuple(m.db,m,s)
+        }.combine(
+            ch_dbs.map { m,d ->
+                tuple(m.id,d)
+            }, by: 0
+        ).map { k, m, s, d ->
+            tuple(m,s,d)
+        }.set { ch_amplicons_with_db }
+
+        CRABS_AMPLIFICATION_EFFICENCY_FIGURE(
+            ch_amplicons_with_db,
+            params.taxon
+        )
+    }
+
     CUSTOM_DUMPSOFTWAREVERSIONS(
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )

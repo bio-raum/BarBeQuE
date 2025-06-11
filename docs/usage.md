@@ -91,3 +91,9 @@ A descriptive name for this analysis run. Should be a single workd without speci
 ### `--list_dbs` [default=null]
 
 List all pre-installed databases and exit. 
+
+## Expert options
+
+### `--taxon` [default=null]
+
+The default mode of this analysis is to run against the entire target database; use this option to focus on a specific taxonomic sub group and get additional information/visualization. The argument must be a valid taxon identifier (such as: 'Chordata' or 'Teleostei').

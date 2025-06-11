@@ -1,0 +1,7 @@
+name: crabs_subset
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bioconda::crabs=1.0.7
