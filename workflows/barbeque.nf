@@ -11,6 +11,7 @@ include { VSEARCH_CLUSTER_FAST }        from './../modules/vsearch/cluster_fast'
 include { CRABS_AMPLIFICATION_EFFICENCY_FIGURE } from './../modules/crabs/amplification_efficency_figure'
 include { CRABS_AMPLICON_LENGTH_FIGURE }from './../modules/crabs/amplicon_length_figure'
 include { HELPER_CLUSTER_CONSENSUS }    from './../modules/helper/cluster_consensus'
+include { STAGE_FILE as STAGE_SAMPLESHEET } from './../modules/helper/stage_file'
 
 workflow BARBEQUE {
 
@@ -50,11 +51,13 @@ workflow BARBEQUE {
     // Check if the samplesheet is valid
     INPUT_CHECK(samplesheet)
 
+    // Copy the samplesheet to the results folder
+    STAGE_SAMPLESHEET(samplesheet)
+
     /*
      Combine each primer set with all requested databases
      [ meta, database_meta, database_path ]
     */
-
     INPUT_CHECK.out.primers.combine(ch_dbs).map { m,n,d ->
         [
             [ 
