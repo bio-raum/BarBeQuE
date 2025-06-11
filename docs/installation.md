@@ -29,7 +29,7 @@ The pipeline comes with simple pre-set profiles for all of these as described [h
 This pipeline requires locally stored genomes in fasta format. To build these, do:
 
 ```
-nextflow run marchoeppner/barbeque -profile singularity \\
+nextflow run bio-raum/BarBeQuE -profile singularity \\
 --build_references \\
 --run_name build_refs \\
 --outdir /path/to/references

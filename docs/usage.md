@@ -61,19 +61,27 @@ The `-r` option specifies a github [release tag](https://github.com/marchoeppner
 
 ### `--input` [default = null ]
 
-This pipeline expects a samplesheet with information on one or several primer sets for benchmarking. The format is a somple tab-delimited text file (.tsv):
+This pipeline expects a samplesheet with information on one or several primer sets for benchmarking. The format is a simple tab-delimited text file (.tsv):
 
 ```TSV
-sample  FWD REV min max
+primer  FWD REV min max
 dobrovolny  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
 ```
+
+| Column | Description |
+| ------ | ----------- |
+| primer | The name of the primer set, determines naming of output files |
+| FWD    | The sequence of the forward primer; can include ambigious (IUPAC) bases |
+| REV    | The sequence of the reverse primer; can include ambibious (IUPAC) bases |
+| min    | minimum length of expected amplicons |
+| max    | maximum length of expected amplicons |
 
 ### `--dbs` [default = null]
 
 A list of one or several pre-installed databases to benchmark against. If multiple databases are requested, they have to be separated by a comma
 
 ```bash
-nextflow run marchoeppner/barbeque --input primers.tsv --dbs midori_lrrna,midori_cytb ...
+nextflow run bio-raum/BarBeQuE --input primers.tsv --dbs midori_lrrna,midori_cytb ...
 ```
 
 ### `--run_name` [default = null]
