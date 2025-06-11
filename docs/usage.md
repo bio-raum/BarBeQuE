@@ -41,7 +41,7 @@ Additional software provisioning tools as described [here](https://www.nextflow.
 b) with a site-specific config file
 
 ```bash
-nextflow run marchoeppner/THIS_PIPELINE -profile my_profile --input samples.tsv \\
+nextflow run bio-raum/BarBeQuE -profile my_profile --input samples.tsv \\
 --run_name pipeline-test 
 ```
 
@@ -52,7 +52,7 @@ In this example, both `--reference_base` and the choice of software provisioning
 If you are running this pipeline in a production setting, you will want to lock the pipeline to a specific version. This is natively supported through nextflow with the `-r` argument:
 
 ```bash
-nextflow run marchoeppner/THIS_PIPELINE -profile my_profile -r 1.0 <other options here>
+nextflow run bio-raum/BarBeQuE -profile my_profile -r 1.0 <other options here>
 ```
 
 The `-r` option specifies a github [release tag](https://github.com/marchoeppner/THIS_PIPELINE/releases) or branch, so could also point to `main` for the very latest code release. Please note that every major release of this pipeline (1.0, 2.0 etc) comes with a new reference data set, which has the be [installed](installation.md) separately.
@@ -72,7 +72,7 @@ dobrovolny  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
 | ------ | ----------- |
 | primer | The name of the primer set, determines naming of output files |
 | FWD    | The sequence of the forward primer; can include ambigious (IUPAC) bases |
-| REV    | The sequence of the reverse primer; can include ambibious (IUPAC) bases |
+| REV    | The sequence of the reverse primer; can include ambigious (IUPAC) bases |
 | min    | minimum length of expected amplicons |
 | max    | maximum length of expected amplicons |
 
