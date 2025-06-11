@@ -10,24 +10,32 @@ workflow INPUT_CHECK {
     samplesheet
         .splitCsv(header:true, sep:'\t')
         .map { row -> fastq_channel(row) }
-        .set { reads }
+        .set { primers }
 
     emit:
-    reads // channel: [ val(meta), [ reads ] ]
+    primers 
 }
 
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
+// Function to get meta hash
 def fastq_channel(LinkedHashMap row) {
     def meta = [:]
-    meta.sample_id    = row.patient_id
+    meta.primer    = row.primer
 
-    def array = []
-    if (!file(row.R1).exists()) {
-        exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.R1}"
+    if (row.FWD) {
+        meta.fwd       = row.FWD
+    } else {
+        log.info "No forward primer defined, cannot proceed!\n"
+        System.exit(1)
     }
-    if (!file(row.R2).exists()) {
-        exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.R2}"
+    if (row.REV) {
+        meta.rev       = row.REV
+    } else {
+        log.info "No reverse primer defined, cannot proceed!\n"
+        System.exit(1)
     }
-    array = [ meta, [ file(row.R1), file(row.R2) ] ]
-    return array
+    
+    meta.min  = row.min
+    meta.max  = row.max
+
+    return meta
 }

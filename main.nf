@@ -2,24 +2,23 @@
 
 nextflow.enable.dsl = 2
 
-// TODO: Update this block with a description and the name of the pipeline
 /**
 ===============================
-Pipeline
+BEMEPRI Pipeline - Benchmarking metabarcoding primers
 ===============================
 
-This Pipeline performs ....
+This Pipeline performs benchmarking of metabarcoding primers
 
 ### Homepage / git
-git@github.com:marchoeppner/pipeline.git
+git@github.com:marchoeppner/bemepri.git
 
 **/
 
 // Pipeline version
 params.version = workflow.manifest.version
 
-// TODO: Rename this to something matching this pipeline, e.g. "AMPLICONS"
-include { MAIN }                from './workflows/main'
+include { BEMEPRI }             from './workflows/bemepri'
+include { BUILD_REFERENCES }    from './workflows/build_references'
 include { paramsSummaryLog }    from 'plugin/nf-schema'
 
 workflow {
@@ -32,16 +31,17 @@ workflow {
     }
 
     WorkflowMain.initialise(workflow, params, log)
-    // TODO: Rename this and the file under lib/ to something matching this pipeline (e.g. WorkflowAmplicons)
     WorkflowPipeline.initialise(params, log)
 
     // Print summary of supplied parameters
     log.info paramsSummaryLog(workflow)
 
-    // TODO: Rename to something matching this pipeline (see above)
-    MAIN()
-
-    multiqc_report = multiqc_report.mix(MAIN.out.qc).toList()
+    if (params.build_references) {
+        BUILD_REFERENCES()
+    } else {
+        BEMEPRI()
+        multiqc_report = multiqc_report.mix(BEMEPRI.out.qc).toList()
+    }
     
     def emailFields = [:]
     emailFields['version'] = workflow.manifest.version
