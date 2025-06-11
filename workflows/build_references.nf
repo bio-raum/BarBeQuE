@@ -8,12 +8,20 @@ include { CRABS_DOWNLOADDB as DOWNLOAD_MIDORI_CO1 }     from './../modules/crabs
 include { CRABS_DOWNLOADDB as DOWNLOAD_MITOFISH }       from './../modules/crabs/download_db'
 include { CRABS_IMPORT as CRABS_IMPORT_MIDORI   }       from './../modules/crabs/import'
 include { CRABS_IMPORT as CRABS_IMPORT_MITOFISH   }     from './../modules/crabs/import'
+include { UNTAR as UNTAR_TAXDUMP }                      from './../modules/untar'
 
 workflow BUILD_REFERENCES {
 
     main:
 
     ch_midori_dbs = Channel.from([])
+
+    taxdump = file(params.references.taxdump_url, checkIfExists: true)
+
+    // Untar the downloaded taxdump archive
+    UNTAR_TAXDUMP(
+        taxdump
+    )
 
     // Download the NCBI taxonomy
     CRABS_DOWNLOADTAXONOMY(

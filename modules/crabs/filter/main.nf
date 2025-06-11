@@ -9,7 +9,8 @@ process CRABS_FILTER {
     tuple val(meta), path(dereplicate)
 
     output:
-    tuple val(meta), path('*filtered.txt'), emit: txt
+    tuple val(meta), path('*filtered.txt')  , emit: txt
+    tuple val(meta), path('*filtered.fa')   , emit: fasta
     path('versions.yml'), emit: versions
 
     script:
@@ -28,6 +29,8 @@ process CRABS_FILTER {
     --no-species-id \\
     --rank-na 2 \\
     --threads ${task.cpus}
+
+    awk -F "\t" '{print ">"\$1"\\n"\$11}' ${prefix}_filtered.txt > ${prefix}_filtered.fa
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

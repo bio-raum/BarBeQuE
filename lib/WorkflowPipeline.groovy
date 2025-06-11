@@ -11,7 +11,7 @@ class WorkflowPipeline {
          if (params.list_dbs) {
             println('Available databases:')
             println('===========================')
-            params.references.keySet().each { db ->
+            params.references.databases.keySet().each { db ->
                 def info = params.references[db].description
                 println("Name: ${db}\tSource: ${info}")
                 println('---------------------------')
