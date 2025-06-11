@@ -4,7 +4,7 @@
 
 [Pipeline version](#specifying-pipeline-version)
 
-[Resources](#resources)
+[ Basic options ](#basic-options)
 
 ## Basic execution
 
@@ -56,3 +56,26 @@ nextflow run marchoeppner/THIS_PIPELINE -profile my_profile -r 1.0 <other option
 ```
 
 The `-r` option specifies a github [release tag](https://github.com/marchoeppner/THIS_PIPELINE/releases) or branch, so could also point to `main` for the very latest code release. Please note that every major release of this pipeline (1.0, 2.0 etc) comes with a new reference data set, which has the be [installed](installation.md) separately.
+
+## Basic options
+
+### `--input` [default = null ]
+
+This pipeline expects a samplesheet with information on one or several primer sets for benchmarking. The format is a somple tab-delimited text file (.tsv):
+
+```tsv
+sample  FWD REV min max
+dobrovolny  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
+```
+
+### `--dbs` [default = null]
+
+A list of one or several pre-installed databases to benchmark against. If multiple databases are requested, they have to be separated by a comma
+
+```bash
+nextflow run marchoeppner/bemepri --input primers.tsv --dbs midori_lrrna,midori_cytb ...
+```
+
+### `--run_name` [default = null]
+
+A descriptive name for this analysis run. Should be a single workd without special characters or white spaces  (i.e. my_analysis_run_01). 
