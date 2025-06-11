@@ -1,0 +1,7 @@
+name: crabs_amplicon_length
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bioconda::crabs=1.0.7
