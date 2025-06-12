@@ -12,6 +12,7 @@ include { CRABS_AMPLIFICATION_EFFICENCY_FIGURE } from './../modules/crabs/amplif
 include { CRABS_AMPLICON_LENGTH_FIGURE }from './../modules/crabs/amplicon_length_figure'
 include { HELPER_CLUSTER_CONSENSUS }    from './../modules/helper/cluster_consensus'
 include { STAGE_FILE as STAGE_SAMPLESHEET } from './../modules/helper/stage_file'
+include { HELPER_TAXONOMIC_COVERAGE }   from './../modules/helper/taxonomic_coverage'
 
 workflow BARBEQUE {
 
@@ -104,6 +105,20 @@ workflow BARBEQUE {
 
     // If a taxon is provided, perform additional visualisation/filtering
     if (params.taxon) {
+
+        // Analyse the coverage of the desired taxonomic level
+        HELPER_TAXONOMIC_COVERAGE(
+            HELPER_CLUSTER_CONSENSUS.out.txt.map { m,t ->
+                tuple(m.db, m, t)
+            }.combine(
+                ch_dbs.map { m,d ->
+                    tuple(m.id,d)
+                }, by: 0
+            ).map { k, m, s, d ->
+                tuple(m,s,d)
+            },
+            params.taxon
+        )
 
         // Generate a subset based on the --taxon argument
         CRABS_SUBSET(

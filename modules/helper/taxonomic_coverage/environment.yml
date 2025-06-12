@@ -1,0 +1,9 @@
+name: helper_taxonomic_coverage
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - etetoolkit
+  - ete3 
+  - ete_toolchain

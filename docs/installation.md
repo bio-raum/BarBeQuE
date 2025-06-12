@@ -4,7 +4,7 @@
 
 Nextflow is a highly portable pipeline engine. Please see the official [installation guide](https://www.nextflow.io/docs/latest/getstarted.html#installation) to learn how to set it up.
 
-This pipeline expects Nextflow version 24.10.8, available [here](https://github.com/nextflow-io/nextflow/releases/tag/v24.10.8).
+This pipeline expects Nextflow version 24.10.8 or later, available [here](https://github.com/nextflow-io/nextflow/releases/tag/v24.10.8).
 
 ## Software provisioning
 
@@ -22,11 +22,13 @@ You can choose one of the following options:
 
 [Conda](https://github.com/conda-forge/miniforge)
 
-The pipeline comes with simple pre-set profiles for all of these as described [here](usage.md); if you plan to use this pipeline regularly, consider adding your own custom profile to our [central repository](https://github.com/bio-raum/nf-configs) to better leverage your available resources.
+The pipeline comes with simple pre-set profiles for all of these as described [here](usage.md); if you plan to use this pipeline regularly, consider adding your own custom profile to our [central repository](https://github.com/bio-raum/nf-configs) to better leverage your available resources. 
+
+**IMPORTANT** We do not recommend you use Conda for production purposes due to issues with reproducibility of environments across platforms and time. For a discussion, see [here](https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30140-6?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2405471218301406%3Fshowall%3Dtrue)
 
 ## Installing the references
 
-This pipeline requires locally stored genomes in fasta format. To build these, do:
+This pipeline requires locally stored databases in [CRABS-compliant](https://github.com/gjeunen/reference_database_creator) format. To build these, do:
 
 ```
 nextflow run bio-raum/BarBeQuE -profile singularity \\
@@ -39,10 +41,63 @@ where `/path/to/references` could be something like `/data/pipelines/references`
 
 If you do not have singularity on your system, you can also specify docker, podman or conda for software provisioning - see the [usage information](usage.md).
 
-The path specified with `--outdir` can then be given to the pipeline during normal execution as `--reference_base`. Please note that the build process will create a pipeline-specific subfolder that must not be given as part of the `--outdir` argument. This pipeline is part of a collection of pipelines that use a shared reference directory and it will choose the appropriate subfolder by itself. 
+Please note that the build process will create a pipeline-specific subfolder that must not be given as part of the `--reference_base` argument. This pipeline is part of a collection of pipelines that use a shared reference directory and it will choose the appropriate subfolder by itself. 
 
 ## Site-specific config file
 
 If you run on anything other than a local system, this pipeline requires a site-specific configuration file to be able to talk to your cluster or compute infrastructure. Nextflow supports a wide range of such infrastructures, including Slurm, LSF and SGE - but also Kubernetes and AWS. For more information, see [here](https://www.nextflow.io/docs/latest/executor.html).
 
 Site-specific config-files for our pipeline ecosystem are stored centrally on [github](https://github.com/bio-raum/nf-configs). Please talk to us if you want to add your system.
+
+### Custom config
+
+If you absolutely do not want to add your system to our central config repository, you can manually pass a compatible configuration to nextflow using the `-c`  command line option:
+
+```bash
+nextflow -c my.config run bio-raum/BarBeQuE -profile myprofile -r 1.0.1 --input samples.csv --run_name my_run_name --reference_base /path/to/references
+```
+
+A basic example using Singularity may look as follows:
+
+```GROOVY
+process {
+  resourceLimits = [ cpus: 16, memory: 64.GB, time: 72.h ]
+}
+
+singularity {
+  enabled = true
+  cacheDir = "/path/to/singularity_cache"
+}
+``` 
+This would be for a single computer, with 16 cores and 64GB Ram, using Singularity. Containers are cached to the specified location to be re-used on subsequent pipeline runs.  
+
+Or with the Conda/Mamba package manager:
+
+```GROOVY
+process {
+  resourceLimits = [ cpus: 16, memory: 64.GB, time: 72.h ]
+}
+
+conda {
+  enabled = true
+  useMamba = true
+  cacheDir = "/path/to/conda_cache"
+}
+```
+
+Finally, if you are planning to run this pipeline on a cluster, your config my look as follows:
+
+```GROOVY
+process {
+  executor = 'slurm'
+  queue = 'all' 
+  resourceLimits = [ cpus: 20, memory: 250.GB, time: 240.h ]
+}
+
+singularity {
+  enabled = true
+  cacheDir = "/path/to/singularity_cache"
+}
+``` 
+
+Here, we specify that the pipeline should use the SLURM resource manager for job submission to a partition called "all", and that the configuration of individual nodes is 20 cores with 250GB of RAM. Again, we use Singularity (which could be switched to Conda, Apptainer etc - whatever fits your situation).

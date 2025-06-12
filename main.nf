@@ -4,13 +4,13 @@ nextflow.enable.dsl = 2
 
 /**
 ===============================
-barbeque Pipeline - Benchmarking metabarcoding primers
+BarBeQuE Pipeline - Benchmarking metabarcoding primers
 ===============================
 
 This Pipeline performs benchmarking of metabarcoding primers
 
 ### Homepage / git
-git@github.com:marchoeppner/barbeque.git
+git@github.com:bio-raum/barbeque.git
 
 **/
 

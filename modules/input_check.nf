@@ -21,16 +21,16 @@ def fastq_channel(LinkedHashMap row) {
     def meta = [:]
     meta.primer = row.primer
 
-    if (row.FWD) {
-        meta.fwd = row.FWD
+    if (row.fwd) {
+        meta.fwd = row.fwd
     } else {
-        log.info "No forward primer defined, cannot proceed!\n"
+        log.info "No forward primer defined (fwd), cannot proceed!\n"
         System.exit(1)
     }
-    if (row.REV) {
-        meta.rev = row.REV
+    if (row.rev) {
+        meta.rev = row.rev
     } else {
-        log.info "No reverse primer defined, cannot proceed!\n"
+        log.info "No reverse primer defined (rev), cannot proceed!\n"
         System.exit(1)
     }
     if (row.min) {
