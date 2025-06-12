@@ -96,11 +96,6 @@
     }
   ],
   "properties": {
-    "logo": {
-      "type": "string",
-      "default": "/home/marc/git/bio-raum/barbeque/assets/pipelinelogo.png",
-      "hidden": true
-    },
     "reference_version": {
       "type": "integer",
       "default": 1,
@@ -110,32 +105,19 @@
       "type": "boolean",
       "hidden": true
     },
-    "skip_multiqc": {
-      "type": "boolean",
-      "hidden": true
-    },
-    "email": {
-      "type": "boolean",
-      "hidden": true
-    },
     "midori_version": {
       "type": "string",
       "default": "265_2025-03-08",
       "hidden": true
     },
-    "maxMultiqcEmailFileSize": {
-      "type": "string",
-      "default": "25 MB",
-      "hidden": true
-    },
     "multiqc_config": {
       "type": "string",
-      "default": "/home/marc/git/bio-raum/barbeque/conf/multiqc_config.yaml",
+      "default": "/home/mhoeppner/git/bio-raum/BarBeQuE/conf/multiqc_config.yaml",
       "hidden": true
     },
     "multiqc_logo": {
       "type": "string",
-      "default": "/home/marc/git/bio-raum/barbeque/assets/pipelinelogo.png",
+      "default": "/home/mhoeppner/git/bio-raum/BarBeQuE/assets/pipelinelogo.png",
       "hidden": true
     },
     "publish_dir_mode": {
