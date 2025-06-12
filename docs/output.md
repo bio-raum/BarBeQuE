@@ -5,7 +5,22 @@
 <details markdown=1>
 <summary>reports</summary>
 
-`clustering`
+`consensus` - consensus call of raw taxon assignments
+
+`raw` 
+
+- `crabs` -  raw output from CRABS (insilico pcr, rereplication, filtering)
+
+- `vsearch` - raw output from VSEARCH (clustering of in-silico OTUs)
+
+Additional , when `--taxon`is specified:
+
+`subset` - CRABS result for a specific taxonomic subset (tsv, png)
+
+`tax_coverage` -  Comparison of taxonomic assignments and the taxa represented in the database (tsv, nwk)
+
+`pipeline_info` - traces and logs as well as the input sample sheet
+
 </details>
 
 ## Quality control
