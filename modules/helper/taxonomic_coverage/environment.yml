@@ -4,6 +4,5 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - etetoolkit
-  - ete3 
-  - ete_toolchain
+  - python=3.11
+  - bioconda::grapetree=2.1

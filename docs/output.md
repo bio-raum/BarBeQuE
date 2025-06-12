@@ -5,8 +5,7 @@
 <details markdown=1>
 <summary>reports</summary>
 
-Add information here
-
+`clustering`
 </details>
 
 ## Quality control

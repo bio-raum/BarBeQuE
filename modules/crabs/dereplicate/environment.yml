@@ -1,7 +1,7 @@
-name: fastp
+name: crabs_derep
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - bioconda::fastp=0.23.4
+  - bioconda::crabs=1.0.7

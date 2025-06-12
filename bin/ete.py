@@ -20,7 +20,7 @@ def main(taxname, refs, report, output):
 
     # We pass a taxon name, and must translate it to an NCBI id
     name2taxid = ncbi.get_name_translator([taxname])
-    print(name2taxid)
+
     # the first entry, of which the first value is taken
     taxid = list(name2taxid.items())[0][1][0]
 
