@@ -23,13 +23,25 @@ Additional , when `--taxon`is specified:
 
 </details>
 
-## Quality control
-
 <details markdown=1>
-<summary>MultiQC</summary>
+<summary>TreeViewer support</summary>
+BarBeQuE can produce files that are compatible with [TreeViewer](https://treeviewer.org/) - if the pipeline is run with the `--taxon` argument. 
+The relevant files are located in the `tax_coverage` subfolder. 
 
-- MultiQC/`name_of_pipeline_run`_multiqc_report.html: A graphical and interactive report of various QC steps and results
-
+- Open TreeViewer and load the tree file (.nwk)
+- Under the "Attachment" tab, select "Add attachment" and select the data file (.tsv)
+- Under Modules, select "Add further transformation" and select "Parse node states". 
+- Under Modules, select "Further transformations", 
+  - Select the "Parse node states" transformation you just created
+  - Select the previously attached file as "Data file"
+  - As separator, enter "\t" (tab)
+  - Under "New attribute", select "Use first row as header"
+  - Apply
+  
+When you zoom in the tree, you should now see colored branches indicating the state of the attached taxon
+- green: will likely be amplified
+- brown: will likely not be amplified
+- grey: taxon missing from the database
 </details>
 
 ## Pipeline run metrics
