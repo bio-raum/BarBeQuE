@@ -23,16 +23,16 @@ Additional , when `--taxon`is specified:
 
 </details>
 
-## Support for TreeViewer
-
+<details markdown=1>
+<summary>TreeViewer support</summary>
 BarBeQuE can produce files that are compatible with [TreeViewer](https://treeviewer.org/) - if the pipeline is run with the `--taxon` argument. 
 The relevant files are located in the `tax_coverage` subfolder. 
 
-- Open TreeViewer and load the tree files (.nwk)
+- Open TreeViewer and load the tree file (.nwk)
 - Under the "Attachment" tab, select "Add attachment" and select the data file (.tsv)
 - Under Modules, select "Add further transformation" and select "Parse node states". 
 - Under Modules, select "Further transformations", 
-  - Select "Parse node states" transformation you just created
+  - Select the "Parse node states" transformation you just created
   - Select the previously attached file as "Data file"
   - As separator, enter "\t" (tab)
   - Under "New attribute", select "Use first row as header"
@@ -42,6 +42,7 @@ When you zoom in the tree, you should now see colored branches indicating the st
 - green: will likely be amplified
 - brown: will likely not be amplified
 - grey: taxon missing from the database
+</details>
 
 ## Pipeline run metrics
 
