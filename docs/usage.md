@@ -4,7 +4,9 @@
 
 [Pipeline version](#specifying-pipeline-version)
 
-[ Basic options ](#basic-options)
+[Basic options](#basic-options)
+
+[Expert options](#expert-options)
 
 ## Basic execution
 
@@ -99,3 +101,9 @@ List all pre-installed databases and exit.
 ### `--taxon` [default=null]
 
 The default mode of this analysis is to run against the entire target database; use this option to focus on a specific taxonomic sub group and get additional information/visualization. The argument must be a valid taxon identifier (such as: 'Chordata' or 'Mammalia'). For the moment, the pipeline cannot validate your taxon argument and we found that some combinations of databases and perfectly valid taxon arguments will nevertheless crash CRABS.
+
+## Expert options
+
+### `--crabs_insilicopcr_options` [ default = null ]
+
+Pass custom options to the insilico PCR stage of the CRABS analysis. This may be used to e.g. increase to decrease the number of allowed mismatched bases (`--mismatch 2`). 
