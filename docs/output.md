@@ -13,7 +13,7 @@
 
 - `vsearch` - raw output from VSEARCH (clustering of in-silico OTUs)
 
-Additional , when `--taxon`is specified:
+Additional , when `--taxon` is specified:
 
 `subset` - CRABS result for a specific taxonomic subset (tsv, png)
 
