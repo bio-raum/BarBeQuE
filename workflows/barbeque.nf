@@ -29,6 +29,8 @@ workflow BARBEQUE {
     // The pre-installed taxdump folder
     ch_taxdump = file(params.references.taxdump)
 
+    pipeline_settings = Channel.fromPath(dumpParametersToJSON(params.outdir)).collect()
+
     // the database to use - either pre-installed or user-provided
     // Pre-installed can be a list, coma-separated:  db1,db2,db3
     ch_dbs = Channel.from([])
@@ -168,4 +170,17 @@ workflow BARBEQUE {
 
     emit:
     qc = MULTIQC.out.html
+}
+
+// turn the params map to a JSON file
+def dumpParametersToJSON(outdir) {
+    def timestamp = new java.util.Date().format('yyyy-MM-dd_HH-mm-ss')
+    def filename  = "params_${timestamp}.json"
+    def temp_pf   = new File(workflow.launchDir.toString(), ".${filename}")
+    def jsonStr   = groovy.json.JsonOutput.toJson(params)
+    temp_pf.text  = groovy.json.JsonOutput.prettyPrint(jsonStr)
+
+    nextflow.extension.FilesEx.copyTo(temp_pf.toPath(), "${outdir}/pipeline_info/params_${timestamp}.json")
+    temp_pf.delete()
+    return file("${outdir}/pipeline_info/params_${timestamp}.json")
 }

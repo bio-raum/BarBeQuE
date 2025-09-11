@@ -44,7 +44,8 @@ b) with a site-specific config file
 
 ```bash
 nextflow run bio-raum/BarBeQuE -profile my_profile --input samples.tsv \\
---run_name pipeline-test 
+--run_name pipeline-test \\
+--dbs midoria_lrna
 ```
 
 In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration `lsh` and don't have to be provided as command line argument. 
@@ -67,7 +68,7 @@ This pipeline expects a samplesheet with information on one or several primer se
 
 ```TSV
 primer  fwd rev min max
-dobrovolny  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
+16SMeat  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
 ```
 
 | Column | Description |
@@ -94,7 +95,14 @@ A descriptive name for this analysis run. Should be a single workd without speci
 
 ### `--list_dbs` [default=null]
 
-List all pre-installed databases and exit. 
+List all pre-installed databases and exit. Some examples include:
+
+| Name | Description |
+| ---- | ----------- |
+| refseq_mito | The RefSeq dataset of mitochondrial genomes (v1.1) |
+| midori_lrna | The lrRNA database from MIDORI (aka 16S) |
+| midori_cytb | The CYTB database from MIDORI |
+| mitofish | The Mitofish database |
 
 ## Expert options
 
