@@ -12,7 +12,7 @@ class WorkflowPipeline {
             println('Available databases:')
             println('===========================')
             params.references.databases.keySet().each { db ->
-                def info = params.references[db].description
+                def info = params.references.databases[db].description
                 println("Name: ${db}\tSource: ${info}")
                 println('---------------------------')
             }

@@ -1,5 +1,13 @@
 # Installation
 
+[Installating Nextflow](#installing-nextflow)
+
+[Installing references](#installing-the-references)
+
+[Site-specific config](#site-specific-config-file)
+
+[Testing](#testing-the-installation)
+
 ## Installing nextflow
 
 Nextflow is a highly portable pipeline engine. Please see the official [installation guide](https://www.nextflow.io/docs/latest/getstarted.html#installation) to learn how to set it up.
@@ -32,12 +40,13 @@ This pipeline requires locally stored databases in [CRABS-compliant](https://git
 
 ```
 nextflow run bio-raum/BarBeQuE -profile singularity \\
+-r <DESIRED_VERSION> \\
 --build_references \\
 --run_name build_refs \\
 --outdir /path/to/references
 ```
 
-where `/path/to/references` could be something like `/data/pipelines/references` or whatever is most appropriate on your system. 
+where `/path/to/references` could be something like `/data/pipelines/references` or whatever is most appropriate on your system. The <DESIRED_VERSION> should be set to whatever version of BarBeQue you plan on using. Databases will typically only be updated with every major release, so installation is only required once per major release (i.e. 1.0). Also see [versioning.md](versioning.md)
 
 If you do not have singularity on your system, you can also specify docker, podman or conda for software provisioning - see the [usage information](usage.md).
 
@@ -101,3 +110,13 @@ singularity {
 ``` 
 
 Here, we specify that the pipeline should use the SLURM resource manager for job submission to a partition called "all", and that the configuration of individual nodes is 20 cores with 250GB of RAM. Again, we use Singularity (which could be switched to Conda, Apptainer etc - whatever fits your situation).
+
+## Testing the installation
+
+BarBeQue comes with a simple test data sets, which you can run to verify that everything works. To run the test data, combine your profile of choice with the built-ind test profile:
+
+```bash
+nextflow run bio-raum/BarBeQue -r DESIRED_VERSION -profile singularity,test
+```
+
+where `DESIRED_VERSION` should be one of the releases of the pipeline (or 'main' for the latest version of the code).

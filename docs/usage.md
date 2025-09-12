@@ -4,7 +4,9 @@
 
 [Pipeline version](#specifying-pipeline-version)
 
-[ Basic options ](#basic-options)
+[Basic options](#basic-options)
+
+[Expert options](#expert-options)
 
 ## Basic execution
 
@@ -42,7 +44,8 @@ b) with a site-specific config file
 
 ```bash
 nextflow run bio-raum/BarBeQuE -profile my_profile --input samples.tsv \\
---run_name pipeline-test 
+--run_name pipeline-test \\
+--dbs midoria_lrna
 ```
 
 In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration `lsh` and don't have to be provided as command line argument. 
@@ -65,7 +68,7 @@ This pipeline expects a samplesheet with information on one or several primer se
 
 ```TSV
 primer  fwd rev min max
-dobrovolny  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
+16SMeat  GACGAGAAGACCCTRTGGAGC   TCCRAGRTCGCCCCAAYC  50  100
 ```
 
 | Column | Description |
@@ -92,10 +95,23 @@ A descriptive name for this analysis run. Should be a single workd without speci
 
 ### `--list_dbs` [default=null]
 
-List all pre-installed databases and exit. 
+List all pre-installed databases and exit. Some examples include:
+
+| Name | Description |
+| ---- | ----------- |
+| refseq_mito | The RefSeq dataset of mitochondrial genomes (v1.1) |
+| midori_lrna | The lrRNA database from MIDORI (aka 16S) |
+| midori_cytb | The CYTB database from MIDORI |
+| mitofish | The Mitofish database |
 
 ## Expert options
 
 ### `--taxon` [default=null]
 
 The default mode of this analysis is to run against the entire target database; use this option to focus on a specific taxonomic sub group and get additional information/visualization. The argument must be a valid taxon identifier (such as: 'Chordata' or 'Mammalia'). For the moment, the pipeline cannot validate your taxon argument and we found that some combinations of databases and perfectly valid taxon arguments will nevertheless crash CRABS.
+
+## Expert options
+
+### `--crabs_insilicopcr_options` [ default = null ]
+
+Pass custom options to the insilico PCR stage of the CRABS analysis. This may be used to e.g. increase to decrease the number of allowed mismatched bases (`--mismatch 2`). 
