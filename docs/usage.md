@@ -108,12 +108,12 @@ List all pre-installed databases and exit. Some examples include:
 
 ### `--custom_db` [default=null]
 
-BarBeQue supports the use of custom databases, that is databases not installed through `--build_references`. If you have such a use case, please check the Crabs documentation for details on how to produce such a database (.txt) [here](https://github.com/gjeunen/reference_database_creator?tab=readme-ov-file#5-crabs-workflow). Make sure you use the same [version](software.md) of crabs that is used by BarBeQueue to avoid compatibility issues. 
+BarBeQue supports the use of custom databases, that is databases not installed through `--build_references`. If you have such a use case, please check the Crabs documentation for details on how to produce such a database (.txt) [here](https://github.com/gjeunen/reference_database_creator?tab=readme-ov-file#5-crabs-workflow). Make sure you use the same [version](software.md) of crabs that is used by BarBeQue to avoid compatibility issues. 
 
 In brief, the following steps are needed:
 
 - Download ncbi taxonomy - this you can re-use from your locally installed BarBeQue references
-- Download the desired data through one of the crabs download utilities
+- Download the desired data through one of the crabs download utilities, paying attention any optional arguments for taxonomic groups etc:
   - --download-bold
   - --download-embl
   - --download-greengenes

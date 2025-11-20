@@ -19,7 +19,7 @@ process CRABS_INSILICOPCR {
     script:
 
     def args = task.ext.args ?: ''
-    def prefix = task.ext.args ?: meta.primer + "_" + meta.db
+    def prefix = task.ext.prefix ?: meta.primer + "_" + meta.db
 
     """
     crabs $args --in-silico-pcr \\
