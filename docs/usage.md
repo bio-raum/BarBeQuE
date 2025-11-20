@@ -108,7 +108,7 @@ List all pre-installed databases and exit. Some examples include:
 
 ### `--taxon` [default=null]
 
-The default mode of this analysis is to run against the entire target database; use this option to focus on a specific taxonomic sub group and get additional information/visualization. The argument must be a valid taxon identifier (such as: 'Chordata' or 'Mammalia'). For the moment, the pipeline cannot validate your taxon argument and we found that some combinations of databases and perfectly valid taxon arguments will nevertheless crash CRABS.
+The default mode of this analysis is to run against the entire target database; use this option to focus on a specific [taxonomic sub group](https://www.ncbi.nlm.nih.gov/taxonomy) and get additional information/visualization. The argument must be a valid taxon identifier (such as: 'Chordata' or 'Mammalia'). For the moment, the pipeline cannot validate your taxon argument and we found that some combinations of databases and perfectly valid taxon arguments will nevertheless crash CRABS.
 
 ## Expert options
 

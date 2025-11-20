@@ -34,12 +34,10 @@ workflow BARBEQUE {
     // the database to use - either pre-installed or user-provided
     // Pre-installed can be a list, coma-separated:  db1,db2,db3
     ch_dbs = Channel.from([])
+    these_dbs = []
     if (params.custom_db) {
-        ch_dbs = Channel.from(
-            [[ "id": "custom", "db": file(params.custom_db, checkIfExists: true) ]]
-        )
+        these_dbs <<  [ [ "id": "custom" ], file(params.custom_db, checkIfExists: true) ]
     } else if (params.dbs) {
-        these_dbs = []
         valid_databases = params.references.databases.keySet()
         params.dbs.split(",").collect{ it.toLowerCase()}.each { db ->
             if (!valid_databases.contains(db)) {
@@ -48,8 +46,8 @@ workflow BARBEQUE {
             }
             these_dbs << [ ["id": db, ], file(params.references.databases[db].db, checkIfExists: true)  ]
         }
-        ch_dbs = Channel.fromList(these_dbs)
     }
+    ch_dbs = Channel.fromList(these_dbs)
 
     // Check if the samplesheet is valid
     INPUT_CHECK(samplesheet)
