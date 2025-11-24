@@ -10,11 +10,14 @@ Outputs are stored, by default, in the folder "results". The structure and conte
 <summary>Consensus calls</summary>
 
 ```TSV
-SeqID	Seq_name	Taxid	superkingdom	phylum	class	order	family	genus	species	lca_name	lca_taxid	lca_rank	cluster_members	amplicon
+SeqID	Seq_name  Taxid	superkingdom	phylum	class	order	family	genus	species	lca_name	lca_taxid	lca_rank	cluster_members	amplicon
 FJ476160	Dictyostelium discoideum	44689	NA	Evosea	Eumycetozoa	Dictyosteliales	Dictyosteliaceae	Dictyostelium	Dictyostelium discoideum	Eukaryota	2759	domain	Dicathais orbita;Dictyostelium discoideum	TTTAAGAAATTTAATAGGCTTACCATATATTTATAAAAAAGTAAGGCTGCTAAGAACTTT
 KR013194	Diachea leucopodia	385471	NA	Evosea	Eumycetozoa	Stemonitida	Stemonitidae	Diachea	Diachea leucopodia	Eukaryota	2759	domain	Fuligo septica;Physarella oblonga;Physarum pusillum;Craterium leucocephalum;Stemonitis axifera;Stemonitopsis typhina;Arcyria obvelata;Perichaena chrysosperma;Physarum xylophilum;Homo sapiens;Homo sapiens;Homo sapiens;Homo sapiens;Diachea leucopodia;Phascolosoma esculenta;Homo sapiens;Homo sapiens;Homo sapiens;Processina dashahensis;Diderma crustaceum;Pinjalo pinjalo;Megalaspis cordyla;Lutjanus rivulatus;Cnemaspis nilagirica;Hahnia ngai;Tapinoma indicum;Patu shiluensis;Caligus priacanthi;Homo sapiens;Homo sapiens;Homo sapiens;Aconurella prolixa;Aceria guerreronis;Grylloprimevala jilina;Atlanta turriculata;Heliconoides inflatus;Cathaica polystigma;Nesiohelix moreletiana;Karaftohelix maackii	TTTAATTTATTAATGCAAACAGTACCTAACAAACCCACAGGTCCTAAACTACCAAACCTGCATTAAAAATTTC
 JF339211	Stemonitis axifera	211147	NA	Evosea	Eumycetozoa	Stemonitida	Stemonitidae	Stemonitis	Stemonitis axifera	Eukaryota	2759	domain	Fuligo septica;Physarella oblonga;Physarum pusillum;Craterium leucocephalum;Stemonitis axifera;Stemonitopsis typhina;Arcyria obvelata;Perichaena chrysosperma;Physarum xylophilum;Homo sapiens;Homo sapiens;Homo sapiens;Homo sapiens;Diachea leucopodia;Phascolosoma esculenta;Homo sapiens;Homo sapiens;Homo sapiens;Processina dashahensis;Diderma crustaceum;Pinjalo pinjalo;Megalaspis cordyla;Lutjanus rivulatus;Cnemaspis nilagirica;Hahnia ngai;Tapinoma indicum;Patu shiluensis;Caligus priacanthi;Homo sapiens;Homo sapiens;Homo sapiens;Aconurella prolixa;Aceria guerreronis;Grylloprimevala jilina;Atlanta turriculata;Heliconoides inflatus;Cathaica polystigma;Nesiohelix moreletiana;Karaftohelix maackii	TTTAATTTATTAATGCAAACAGTACCTAACAAACCCACAGGTCCTAAACTACCAAACCTGCATTAAAAATTTC
 ```
+
+Please note that this table not only includes the (potentially) amplifiable taxa, but also information on barcodes that are identical among two more more taxa (column: cluster_members). If two or more species are listed here, it means that the resulting barcode sequence cannot be used to (bioinformatically) separate them. If species-level resolution of these species is required for your question, you should most likely choose a different primer system. 
+
 </details>
 <p>
 
@@ -52,7 +55,7 @@ Additional , when `--taxon` is specified:
 <details markdown=1>
 <summary>Taxon presence/absence</summary>
 
-When specifing a taxonomic group to specifically characterize (e.g. mammals), the pipeline will return a table for each organism in that group with a status call for a particular primer set and database:
+When specifing a taxonomic group to specifically characterize (e.g. mammals), the pipeline will generate a table listing each organism in that group with a status call for a particular primer set and database:
 
 | Status | Description |
 | ------ | ----------- |

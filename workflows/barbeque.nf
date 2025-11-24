@@ -34,12 +34,10 @@ workflow BARBEQUE {
     // the database to use - either pre-installed or user-provided
     // Pre-installed can be a list, coma-separated:  db1,db2,db3
     ch_dbs = Channel.from([])
+    these_dbs = []
     if (params.custom_db) {
-        ch_dbs = Channel.from(
-            [[ "id": "custom", "db": file(params.custom_db, checkIfExists: true) ]]
-        )
+        these_dbs <<  [ [ "id": "custom" ], file(params.custom_db, checkIfExists: true) ]
     } else if (params.dbs) {
-        these_dbs = []
         valid_databases = params.references.databases.keySet()
         params.dbs.split(",").collect{ it.toLowerCase()}.each { db ->
             if (!valid_databases.contains(db)) {
@@ -48,8 +46,8 @@ workflow BARBEQUE {
             }
             these_dbs << [ ["id": db, ], file(params.references.databases[db].db, checkIfExists: true)  ]
         }
-        ch_dbs = Channel.fromList(these_dbs)
     }
+    ch_dbs = Channel.fromList(these_dbs)
 
     // Check if the samplesheet is valid
     INPUT_CHECK(samplesheet)
@@ -80,9 +78,18 @@ workflow BARBEQUE {
     )
     ch_versions = ch_versions.mix(CRABS_INSILICOPCR.out.versions)
 
+    CRABS_INSILICOPCR.out.txt.branch { m,t ->
+        valid: file(t).size() > 0
+        invalid: file(t).size() == 0
+    }.set { ch_insilico_by_status }
+
+    ch_insilico_by_status.invalid.subscribe { m,t ->
+        log.warn "${m.primer} did not produce any pcr products, stopping primer set"
+    }
+
     // dereplicate in-silico amplicons, takes [meta, txt]
     CRABS_DEREPLICATE(
-        CRABS_INSILICOPCR.out.txt
+        ch_insilico_by_status.valid
     )
     ch_versions = ch_versions.mix(CRABS_DEREPLICATE.out.versions)
 
@@ -127,19 +134,28 @@ workflow BARBEQUE {
             CRABS_FILTER.out.txt,
             params.taxon
         )
+
+        CRABS_SUBSET.out.txt.branch { m,t ->
+            valid: t.size() > 0
+            invalid: t.size() == 0
+        }.set { ch_subset_by_status }
+
+        ch_subset_by_status.invalid.subscribe {m,t ->
+            log.warn "No hits left after subsetting ${m.primer} with ${params.taxon} - stopping."
+        }
         
         // Visualize the length distribution of putative amplicons
         CRABS_AMPLICON_LENGTH_FIGURE(
-            CRABS_SUBSET.out.txt
+            ch_subset_by_status.valid
         )
 
         // Visualize diversity of amplicons
         CRABS_DIVERSITY_FIGURE(
-            CRABS_SUBSET.out.txt
+            ch_subset_by_status.valid
         )
 
         // Combine each subset with the correct database
-        CRABS_SUBSET.out.txt.map {m, s ->
+        ch_subset_by_status.valid.map {m, s ->
             tuple(m.db,m,s)
         }.combine(
             ch_dbs.map { m,d ->

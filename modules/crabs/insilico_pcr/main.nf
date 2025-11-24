@@ -6,8 +6,8 @@ process CRABS_INSILICOPCR {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/crabs:1.9.0--pyhdfd78af_0' :
-        'quay.io/biocontainers/crabs:1.9.0--pyhdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/crabs:1.14.0--pyhdfd78af_0' :
+        'quay.io/biocontainers/crabs:1.14.0--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(db)
@@ -19,7 +19,7 @@ process CRABS_INSILICOPCR {
     script:
 
     def args = task.ext.args ?: ''
-    def prefix = task.ext.args ?: meta.primer + "_" + meta.db
+    def prefix = task.ext.prefix ?: meta.primer + "_" + meta.db
 
     """
     crabs $args --in-silico-pcr \\

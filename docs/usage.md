@@ -106,11 +106,39 @@ List all pre-installed databases and exit. Some examples include:
 
 ## Expert options
 
+### `--custom_db` [default=null]
+
+BarBeQue supports the use of custom databases, that is databases not installed through `--build_references`. If you have such a use case, please check the Crabs documentation for details on how to produce such a database (.txt) [here](https://github.com/gjeunen/reference_database_creator?tab=readme-ov-file#5-crabs-workflow). Make sure you use the same [version](software.md) of crabs that is used by BarBeQue to avoid compatibility issues. 
+
+In brief, the following steps are needed:
+
+- Download ncbi taxonomy - this you can re-use from your locally installed BarBeQue references
+- Download the desired data through one of the crabs download utilities, paying attention any optional arguments for taxonomic groups etc:
+  - --download-bold
+  - --download-embl
+  - --download-greengenes
+  - --download-greengenes2
+  - --download-midori
+  - --download-mitofish
+  - --download-ncbi
+  - --download-silva
+- Import the database into the crabs format
+
+The resulting Text file (.txt) can then be passed to BarBeQue with `--custom_db`. 
+
 ### `--taxon` [default=null]
 
-The default mode of this analysis is to run against the entire target database; use this option to focus on a specific taxonomic sub group and get additional information/visualization. The argument must be a valid taxon identifier (such as: 'Chordata' or 'Mammalia'). For the moment, the pipeline cannot validate your taxon argument and we found that some combinations of databases and perfectly valid taxon arguments will nevertheless crash CRABS.
+The default mode of this analysis is to run against the entire target database; use this option to focus on a specific [taxonomic sub group](https://www.ncbi.nlm.nih.gov/taxonomy) and get additional information/visualization. The argument must be a valid taxon identifier (such as: 'Chordata' or 'Mammalia') at one of the following taxonomic levels:
 
-## Expert options
+- superkingdom
+- phylum
+- class
+- order
+- family
+- genus
+- species
+
+For the moment, the pipeline cannot validate your taxon argument and will either crash or return empty results when an incomatible/incorrect taxon is provided. 
 
 ### `--crabs_insilicopcr_options` [ default = null ]
 

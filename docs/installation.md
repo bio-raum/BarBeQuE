@@ -43,12 +43,12 @@ nextflow run bio-raum/BarBeQuE -profile singularity \\
 -r <DESIRED_VERSION> \\
 --build_references \\
 --run_name build_refs \\
---outdir /path/to/references
+--reference_base /path/to/references
 ```
 
 where `/path/to/references` could be something like `/data/pipelines/references` or whatever is most appropriate on your system. The <DESIRED_VERSION> should be set to whatever version of BarBeQue you plan on using. Databases will typically only be updated with every major release, so installation is only required once per major release (i.e. 1.0). Also see [versioning.md](versioning.md)
 
-If you do not have singularity on your system, you can also specify docker, podman or conda for software provisioning - see the [usage information](usage.md).
+If you do not have singularity on your system, you can also specify docker, apptainer, podman or conda for software provisioning - see the [usage information](usage.md).
 
 Please note that the build process will create a pipeline-specific subfolder that must not be given as part of the `--reference_base` argument. This pipeline is part of a collection of pipelines that use a shared reference directory and it will choose the appropriate subfolder by itself. 
 
@@ -69,6 +69,10 @@ nextflow -c my.config run bio-raum/BarBeQuE -profile myprofile -r 1.0.1 --input 
 A basic example using Singularity may look as follows:
 
 ```GROOVY
+params {
+  reference_base = "/path/to/references"
+}
+
 process {
   resourceLimits = [ cpus: 16, memory: 64.GB, time: 72.h ]
 }
@@ -83,6 +87,10 @@ This would be for a single computer, with 16 cores and 64GB Ram, using Singulari
 Or with the Conda/Mamba package manager:
 
 ```GROOVY
+params {
+  reference_base = "/path/to/references"
+}
+
 process {
   resourceLimits = [ cpus: 16, memory: 64.GB, time: 72.h ]
 }
@@ -97,6 +105,10 @@ conda {
 Finally, if you are planning to run this pipeline on a cluster, your config my look as follows:
 
 ```GROOVY
+params {
+  reference_base = "/path/to/references"
+}
+
 process {
   executor = 'slurm'
   queue = 'all' 
