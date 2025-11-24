@@ -6,8 +6,8 @@ process CRABS_AMPLIFICATION_EFFICENCY_FIGURE {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/crabs:1.12.0--pyhdfd78af_0' :
-        'quay.io/biocontainers/crabs:1.12.0--pyhdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/crabs:1.14.0--pyhdfd78af_0' :
+        'quay.io/biocontainers/crabs:1.14.0--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(txt), path(db)

@@ -9,8 +9,10 @@ include { CRABS_DOWNLOADDB as DOWNLOAD_MIDORI_CO1 }     from './../modules/crabs
 include { CRABS_DOWNLOADDB as DOWNLOAD_MIDORI_CO2 }     from './../modules/crabs/download_db'
 include { CRABS_DOWNLOADDB as DOWNLOAD_MIDORI_CO3 }     from './../modules/crabs/download_db'
 include { CRABS_DOWNLOADDB as DOWNLOAD_MITOFISH }       from './../modules/crabs/download_db'
+include { CRABS_DOWNLOADDB as DOWNLOAD_METAFISH }       from './../modules/crabs/download_db'
 include { CRABS_IMPORT as CRABS_IMPORT_MIDORI   }       from './../modules/crabs/import'
 include { CRABS_IMPORT as CRABS_IMPORT_MITOFISH   }     from './../modules/crabs/import'
+include { CRABS_IMPORT as CRABS_IMPORT_METAFISH   }     from './../modules/crabs/import'
 include { CRABS_IMPORT as CRABS_IMPORT_REFSEQ   }       from './../modules/crabs/import'
 include { UNTAR as UNTAR_TAXDUMP }                      from './../modules/untar'
 include { GUNZIP as GUNZIP_REFSEQ }                     from './../modules/gunzip'
@@ -87,15 +89,24 @@ workflow BUILD_REFERENCES {
         Channel.from([ db: "mitofish" ])
     )
 
+    // Download metafish-lib
+    DOWNLOAD_METAFISH(
+        Channel.from([ db: "metafish" ])
+    )
+
     // Import midori databases into crabs format
     CRABS_IMPORT_MIDORI(
         ch_midori_dbs,
         CRABS_DOWNLOADTAXONOMY.out.taxonomy.collect()
     )
-
     // Import mitofish database into crabs format
     CRABS_IMPORT_MITOFISH(
         DOWNLOAD_MITOFISH.out.db,
+        CRABS_DOWNLOADTAXONOMY.out.taxonomy.collect()
+    )
+    // Import metafish database into crabs format
+    CRABS_IMPORT_METAFISH(
+        DOWNLOAD_METAFISH.out.db,
         CRABS_DOWNLOADTAXONOMY.out.taxonomy.collect()
     )
 

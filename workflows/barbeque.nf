@@ -78,9 +78,18 @@ workflow BARBEQUE {
     )
     ch_versions = ch_versions.mix(CRABS_INSILICOPCR.out.versions)
 
+    CRABS_INSILICOPCR.out.txt.branch { m,t ->
+        valid: file(t).size() > 0
+        invalid: file(t).size() == 0
+    }.set { ch_insilico_by_status }
+
+    ch_insilico_by_status.invalid.subscribe { m,t ->
+        log.warn "${m.primer} did not produce any pcr products, stopping primer set"
+    }
+
     // dereplicate in-silico amplicons, takes [meta, txt]
     CRABS_DEREPLICATE(
-        CRABS_INSILICOPCR.out.txt
+        ch_insilico_by_status.valid
     )
     ch_versions = ch_versions.mix(CRABS_DEREPLICATE.out.versions)
 
@@ -125,19 +134,28 @@ workflow BARBEQUE {
             CRABS_FILTER.out.txt,
             params.taxon
         )
+
+        CRABS_SUBSET.out.txt.branch { m,t ->
+            valid: t.size() > 0
+            invalid: t.size() == 0
+        }.set { ch_subset_by_status }
+
+        ch_subset_by_status.invalid.subscribe {m,t ->
+            log.warn "No hits left after subsetting ${m.primer} with ${params.taxon} - stopping."
+        }
         
         // Visualize the length distribution of putative amplicons
         CRABS_AMPLICON_LENGTH_FIGURE(
-            CRABS_SUBSET.out.txt
+            ch_subset_by_status.valid
         )
 
         // Visualize diversity of amplicons
         CRABS_DIVERSITY_FIGURE(
-            CRABS_SUBSET.out.txt
+            ch_subset_by_status.valid
         )
 
         // Combine each subset with the correct database
-        CRABS_SUBSET.out.txt.map {m, s ->
+        ch_subset_by_status.valid.map {m, s ->
             tuple(m.db,m,s)
         }.combine(
             ch_dbs.map { m,d ->
