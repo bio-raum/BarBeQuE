@@ -16,6 +16,24 @@ KR013194	Diachea leucopodia	385471	NA	Evosea	Eumycetozoa	Stemonitida	Stemonitida
 JF339211	Stemonitis axifera	211147	NA	Evosea	Eumycetozoa	Stemonitida	Stemonitidae	Stemonitis	Stemonitis axifera	Eukaryota	2759	domain	Fuligo septica;Physarella oblonga;Physarum pusillum;Craterium leucocephalum;Stemonitis axifera;Stemonitopsis typhina;Arcyria obvelata;Perichaena chrysosperma;Physarum xylophilum;Homo sapiens;Homo sapiens;Homo sapiens;Homo sapiens;Diachea leucopodia;Phascolosoma esculenta;Homo sapiens;Homo sapiens;Homo sapiens;Processina dashahensis;Diderma crustaceum;Pinjalo pinjalo;Megalaspis cordyla;Lutjanus rivulatus;Cnemaspis nilagirica;Hahnia ngai;Tapinoma indicum;Patu shiluensis;Caligus priacanthi;Homo sapiens;Homo sapiens;Homo sapiens;Aconurella prolixa;Aceria guerreronis;Grylloprimevala jilina;Atlanta turriculata;Heliconoides inflatus;Cathaica polystigma;Nesiohelix moreletiana;Karaftohelix maackii	TTTAATTTATTAATGCAAACAGTACCTAACAAACCCACAGGTCCTAAACTACCAAACCTGCATTAAAAATTTC
 ```
 
+| Column | Description |
+| ------ | ----------- |
+| SeqID	 | The database ID of the match |
+| Seq_name | The species |
+| Taxid | The NCBI taxon ID |
+| superkingdom | The superkingdom |
+| phylum	| The phylum  |
+| class	| The class |
+| order	| The order |
+| family | The family |
+| genus	| The genus |
+| species	| The species |
+| lca_name | The level of the last command ancestor (lca) of identical matches |
+|	lca_taxid	| The NCBI taxon id of the lca |
+| lca_rank | The rank of the lca |
+| cluster_members | Species with identical barcode sequence |
+|	amplicon | The barcode sequence |
+
 Please note that this table not only includes the (potentially) amplifiable taxa, but also information on barcodes that are identical among two more more taxa (column: cluster_members). If two or more species are listed here, it means that the resulting barcode sequence cannot be used to (bioinformatically) separate them. If species-level resolution of these species is required for your question, you should most likely choose a different primer system. 
 
 </details>

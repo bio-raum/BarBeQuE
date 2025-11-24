@@ -8,6 +8,8 @@
 
 This pipelines takes sets of PCR primers for metabarcoding and benchmarks their performance against one or several reference databases. 
 
+![schema](images/barbeque_schema_v1.png)
+
 ## Documentation 
 
 1. [What happens in this pipeline?](docs/pipeline.md)

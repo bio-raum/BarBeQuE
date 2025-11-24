@@ -1,6 +1,6 @@
 # Versioning
 
-Scientific analysis should always be reproducible. This requires that not only the code is versioned, but also the reference data used (if any). 
+Scientific analyses should always be reproducible. This requires that not only the code is versioned, but also the reference data used (if any). 
 
 BarBeQue is versioned through github, including regular major and minor releases with specific feature sets and software versions.
 
@@ -13,6 +13,7 @@ Specifically:
 | All Midori databases | Yes |
 | Refseq Mitochondria | Yes |
 | Mitofish | No |
+| Meta-fish-lib | No |
 
 Databases like Mitofish are downloaded 'on the day' representing whatever the state of the database is on the day you installed it. This is in contrast to e.g. Midori, which is versioned based on the GenBank release it was built from.
 
