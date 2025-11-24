@@ -63,10 +63,6 @@ If mulling containers is not an option, you can also refer to github actions and
 
 Github supports the automatic execution of specific tasks on code branches, such as the automatic linting of the code base or building and pushing of Docker containers. To add github workflows to your repository, place them into the sub-directory `.github/workflows`. 
 
-### Docker containers
-
-In order to automatically push Docker containers, you must add your docker username and API token as secrets to your repository (DOCKERHUB_USERNAME and DOCKERHUB_TOKEN). Secrets can be created under Settings/Secrets and Variables/Actions. Of course, you also need to have an account on Dockerhub and generate a permanent token.  The relevant workflow actions are included in `dot_github/workflows`. These will read the `Dockerfile` from the root of this repository, import environment.yml (if you wish to install conda packages into the container), build the whole thing and push the container to an appropriate dockerhub repository 
-
 ### Linting
 
 Nextflow does not have a dedicated linting tool. However, since most of nextflow is actually Groovy, the groovy linting suite works just fine, I find. Linting is set up as an automatic workflow for every push to the TEMPLATE and dev branch as well as pull requests. You may wish to run this stand-alone also, before you commit your code. I would strongly recommend setting this up in a [conda](https://github.com/conda-forge/miniforge) environment, but it should also work on your *nix system directly (albeit with some minor pitfalls re: java version). 

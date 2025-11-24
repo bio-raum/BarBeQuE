@@ -86,12 +86,12 @@ Please make sure that your values for min/max are somewhat realistic for your pr
 A list of one or several pre-installed databases to benchmark against. If multiple databases are requested, they have to be separated by a comma
 
 ```bash
-nextflow run bio-raum/BarBeQuE --input primers.tsv --dbs midori_lrrna,midori_cytb ...
+nextflow run bio-raum/BarBeQuE --input primers.tsv --dbs midori_lrrna,refseq_mito ...
 ```
 
 ### `--run_name` [default = null]
 
-A descriptive name for this analysis run. Should be a single workd without special characters or white spaces  (i.e. my_analysis_run_01). 
+A descriptive name for this analysis run. Should be a single word without special characters or white spaces (i.e. my_analysis_run_01). 
 
 ### `--list_dbs` [default=null]
 
@@ -108,20 +108,12 @@ List all pre-installed databases and exit. Some examples include:
 
 ### `--custom_db` [default=null]
 
-BarBeQue supports the use of custom databases, that is databases not installed through `--build_references`. If you have such a use case, please check the Crabs documentation for details on how to produce such a database (.txt) [here](https://github.com/gjeunen/reference_database_creator?tab=readme-ov-file#5-crabs-workflow). Make sure you use the same [version](software.md) of crabs that is used by BarBeQue to avoid compatibility issues. 
+BarBeQue supports the use of custom databases, that is databases not installed through `--build_references`. If you have such a use case, please check the Crabs documentation for details on how to produce your database (.txt) [here](https://github.com/gjeunen/reference_database_creator?tab=readme-ov-file#5-crabs-workflow). Make sure you use the same [version](software.md) of crabs that is used by BarBeQue to avoid compatibility issues. 
 
 In brief, the following steps are needed:
 
 - Download ncbi taxonomy - this you can re-use from your locally installed BarBeQue references
-- Download the desired data through one of the crabs download utilities, paying attention any optional arguments for taxonomic groups etc:
-  - --download-bold
-  - --download-embl
-  - --download-greengenes
-  - --download-greengenes2
-  - --download-midori
-  - --download-mitofish
-  - --download-ncbi
-  - --download-silva
+- Download the desired data through one of the crabs download utilities, paying attention any optional arguments for taxonomic groups etc
 - Import the database into the crabs format
 
 The resulting Text file (.txt) can then be passed to BarBeQue with `--custom_db`. 
