@@ -118,6 +118,10 @@ In brief, the following steps are needed:
 
 The resulting Text file (.txt) can then be passed to BarBeQue with `--custom_db`. 
 
+### `--cluster_id` [ default = 0.97]
+
+Predicted barcode sequences are clustered based on this similarty threshold to provide an estimate of the taxonomic resolution of a given barcode (i.e. how redundant it is). A smaller threshold will potentially group more barcodes. The default of 0.97 corresponds to the default clustering threshold used in FooDMe2. 
+
 ### `--taxon` [default=null]
 
 The default mode of this analysis is to run against the entire target database; use this option to focus on a specific [taxonomic sub group](https://www.ncbi.nlm.nih.gov/taxonomy) and get additional information/visualization. The argument must be a valid taxon identifier (such as: 'Chordata' or 'Mammalia') at one of the following taxonomic levels:
