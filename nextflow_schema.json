@@ -80,8 +80,18 @@
         "custom_db": {
           "type": "string",
           "description": "A custom database formatted with crabs 1.0.7 and above"
+        },
+        "cluster_id": {
+          "type": "number",
+          "default": 0.97,
+          "description": "The identity threshold to group barcode sequences by"
+        },
+        "crabs_insilicopcr_options": {
+          "type": "string",
+          "description": "A set of custom options to pass to the in-silico PCR process"
         }
-      }
+      },
+      "required": ["cluster_id"]
     }
   },
   "allOf": [

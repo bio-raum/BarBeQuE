@@ -23,7 +23,6 @@ process VSEARCH_CLUSTER_FAST {
     """
     vsearch --cluster_fast $fa \
     --threads ${task.cpus} \
-    --id 1.0 \
     --qmask none \
     --uc $uc $args
 
