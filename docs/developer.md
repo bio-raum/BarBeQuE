@@ -4,7 +4,7 @@ This document is a brief overview of how to use this code base. Some understandi
 
 ## Editor
 
-I personally recommend [Microsoft Visual Studio Code](https://code.visualstudio.com/download) for working on nextflow pipelines. It's free and comes with a variety of free extensions to support your work. 
+We personally recommend [Microsoft Visual Studio Code](https://code.visualstudio.com/download) for working on nextflow pipelines. It's free and comes with a variety of free extensions to support your work. 
 
 This template specifically is set up to work with the following VS extensions:
 

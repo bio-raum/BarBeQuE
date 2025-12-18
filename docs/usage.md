@@ -113,7 +113,7 @@ BarBeQue supports the use of custom databases, that is databases not installed t
 In brief, the following steps are needed:
 
 - Download ncbi taxonomy - this you can re-use from your locally installed BarBeQue references
-- Download the desired data through one of the crabs download utilities, paying attention any optional arguments for taxonomic groups etc
+- Download the desired data through one of the crabs download utilities, paying attention to any optional arguments for taxonomic groups etc
 - Import the database into the crabs format
 
 The resulting Text file (.txt) can then be passed to BarBeQue with `--custom_db`. 
