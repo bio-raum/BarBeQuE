@@ -22,7 +22,11 @@ def main(taxname, refs, report, output):
     name2taxid = ncbi.get_name_translator([taxname])
 
     # the first entry, of which the first value is taken
-    taxid = list(name2taxid.items())[0][1][0]
+    try:
+        taxid = list(name2taxid.items())[0][1][0]
+    except IndexError:
+        message = f"{taxname} is not a valid taxa name in the NCBI nomenclature. Common errors include misspelling and use of a taxid or common name instead of the latin name."
+        raise ValueError(message)
 
     # the consensus report
     r = open(report, "r")
