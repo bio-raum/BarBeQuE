@@ -221,9 +221,11 @@ def valid_taxon(taxon) {
             
             def data = j[0]
 
-            if (data["scientific_name"]) {
+            // if we see this key, it means that the API was able to find a match in the database - we assume the taxon is valid. 
+            if (data.containsKey("scientific_name")) {
                 return true
             }
+        // This is probably not needed, invalid taxa seem to raise a 400 error instead - see below. 
         } else if (j.containsKey("error")) {
             log.warn "Invalid taxon argument found!"
             return false
