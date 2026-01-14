@@ -31,6 +31,15 @@ workflow BARBEQUE {
 
     pipeline_settings = Channel.fromPath(dumpParametersToJSON(params.outdir)).collect()
 
+    // Check if the specified taxon is valid
+    if (params.taxon) {
+        taxon_valid = valid_taxon(params.taxon)
+        if (!taxon_valid) {
+          log.warn "Specified what appears to be an invalid taxon name - aborting!"
+          System.exit(1)
+        }
+    }
+
     // the database to use - either pre-installed or user-provided
     // Pre-installed can be a list, coma-separated:  db1,db2,db3
     ch_dbs = Channel.from([])
@@ -199,4 +208,36 @@ def dumpParametersToJSON(outdir) {
     nextflow.extension.FilesEx.copyTo(temp_pf.toPath(), "${outdir}/pipeline_info/params_${timestamp}.json")
     temp_pf.delete()
     return file("${outdir}/pipeline_info/params_${timestamp}.json")
+}
+
+def valid_taxon(taxon) {
+    log.info "Checking if ${taxon} is a valid taxon.."
+
+    try {
+
+        def request = new URL("https://rest.ensembl.org/taxonomy/name/${taxon.toString()}?content-type=application/json")
+
+        def j = new groovy.json.JsonSlurper().parseText(new URL("https://rest.ensembl.org/taxonomy/name/${taxon.toString()}?content-type=application/json").getText())
+
+        if (j instanceof ArrayList) {
+            
+            def data = j[0]
+
+            if (data["scientific_name"]) {
+                return true
+            }
+        } else if (j.containsKey("error")) {
+            log.warn "Invalid taxon argument found!"
+            return false
+        }
+
+        return false // unspecified error
+
+    } catch(java.io.IOException ex) {
+       return false
+    } catch(err) {
+        log.warn "Unspecified error encountered, assuming taxon is valid.."
+        return true
+    }
+
 }
