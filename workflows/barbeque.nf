@@ -215,8 +215,6 @@ def valid_taxon(taxon) {
 
     try {
 
-        def request = new URL("https://rest.ensembl.org/taxonomy/name/${taxon.toString()}?content-type=application/json")
-
         def j = new groovy.json.JsonSlurper().parseText(new URL("https://rest.ensembl.org/taxonomy/name/${taxon.toString()}?content-type=application/json").getText())
 
         if (j instanceof ArrayList) {
@@ -234,7 +232,9 @@ def valid_taxon(taxon) {
         return false // unspecified error
 
     } catch(java.io.IOException ex) {
+        // Service returns error, probably invalid taxon argument.
        return false
+    // any other error, most likely service unreachable
     } catch(err) {
         log.warn "Unspecified error encountered, assuming taxon is valid.."
         return true
