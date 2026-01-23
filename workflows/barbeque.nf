@@ -12,6 +12,7 @@ include { CRABS_AMPLIFICATION_EFFICENCY_FIGURE } from './../modules/crabs/amplif
 include { CRABS_AMPLICON_LENGTH_FIGURE }from './../modules/crabs/amplicon_length_figure'
 include { HELPER_CLUSTER_CONSENSUS }    from './../modules/helper/cluster_consensus'
 include { STAGE_FILE as STAGE_SAMPLESHEET } from './../modules/helper/stage_file'
+include { HELPER_CONSENSUS_HISTOGRAM }  from './../modules/helper/consensus_histogram'
 include { HELPER_TAXONOMIC_COVERAGE }   from './../modules/helper/taxonomic_coverage'
 
 workflow BARBEQUE {
@@ -121,6 +122,13 @@ workflow BARBEQUE {
     )
     ch_versions = ch_versions.mix(HELPER_CLUSTER_CONSENSUS.out.versions)
 
+    // convert the consensus file into a histogram of amplicon lengths
+    HELPER_CONSENSUS_HISTOGRAM(
+        HELPER_CLUSTER_CONSENSUS.out.txt
+    )
+    multiqc_files = multiqc_files.mix(HELPER_CONSENSUS_HISTOGRAM.out.json)
+    ch_versions = ch_versions.mix(HELPER_CONSENSUS_HISTOGRAM.out.versions)
+
     // If a taxon is provided, perform additional visualisation/filtering
     if (params.taxon) {
 
@@ -185,10 +193,12 @@ workflow BARBEQUE {
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
-    multiqc_files = multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml)
+    multiqc_by_set = multiqc_files.groupTuple(by: 0)
+    multiqc_by_set.view()
 
     MULTIQC(
-        multiqc_files.collect(),
+        multiqc_by_set,
+        CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
         ch_multiqc_config,
         ch_multiqc_logo
     )

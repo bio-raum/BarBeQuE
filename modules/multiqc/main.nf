@@ -6,7 +6,8 @@ process MULTIQC {
         'quay.io/biocontainers/multiqc:1.21--pyhdfd78af_0' }"
 
     input:
-    path('*')
+    tuple val(meta), path('*')
+    path(software)
     path(config)
     path(logo)
 
@@ -16,7 +17,7 @@ process MULTIQC {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: ''
+    def prefix = task.ext.prefix ?: meta.primer + "_" + meta.db
 
     """
 

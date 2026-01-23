@@ -2,6 +2,6 @@ name: crabs_download_taxonomy
 channels:
   - conda-forge
   - bioconda
-  - defaults
+  
 dependencies:
   - bioconda::crabs=1.14.0
