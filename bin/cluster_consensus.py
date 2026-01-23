@@ -53,7 +53,8 @@ def main(clusters, table, taxdump, output):
     # Get consensus, rank, and disambiguation
     clusters_cons = {}
     for k, v in clusters_taxid.items():
-        disambiguation = ";".join([tax.getName(t) for t in v])
+        # Only get unique taxa for the disambiguation
+        disambiguation = ";".join([tax.getName(t) for t in list(dict.fromkeys(v))])
         cons = tax.lca(v, ignore_missing=True)
         clusters_cons[k] = [
             cons.name,
@@ -61,9 +62,8 @@ def main(clusters, table, taxdump, output):
             cons.rank,
             disambiguation,
         ]
-    
+
     # Dump
-    tab = '\t'
     with open(output, 'w') as fo:
         for k, v in crabs.items():
             line = "\t".join([k, '\t'.join(v[:-1]), '\t'.join(clusters_cons[clusters_seqid[k]]), v[-1]])

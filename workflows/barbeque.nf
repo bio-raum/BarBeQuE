@@ -193,8 +193,8 @@ workflow BARBEQUE {
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
+    // Combine by meta dict to generate separate reports for each primer-db combination
     multiqc_by_set = multiqc_files.groupTuple(by: 0)
-    multiqc_by_set.view()
 
     MULTIQC(
         multiqc_by_set,
