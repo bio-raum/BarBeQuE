@@ -1,4 +1,4 @@
-name: helper_consensus_histogram
+name: helper_consensus_distribution
 channels:
   - conda-forge
   - bioconda

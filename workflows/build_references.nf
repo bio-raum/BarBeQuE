@@ -21,10 +21,10 @@ workflow BUILD_REFERENCES {
 
     main:
 
-    ch_midori_dbs = Channel.from([])
+    ch_midori_dbs = channel.from([])
 
-    taxdump = Channel.fromPath(file(params.references.taxdump_url, checkIfExists: true))
-    refseq_mito = Channel.fromPath(file("https://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.1.1.genomic.fna.gz", checkIfExists: true))
+    taxdump = channel.fromPath(file(params.references.taxdump_url, checkIfExists: true))
+    refseq_mito = channel.fromPath(file("https://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.1.1.genomic.fna.gz", checkIfExists: true))
 
     GUNZIP_REFSEQ(
         refseq_mito.map {f ->
@@ -46,52 +46,52 @@ workflow BUILD_REFERENCES {
 
     // Download the NCBI taxonomy
     CRABS_DOWNLOADTAXONOMY(
-        Channel.from([ build: params.reference_version])
+        channel.from([ build: params.reference_version])
     )
 
     // Download Midori lrRNA database
     DOWNLOAD_MIDORI_LRRNA(
-        Channel.from([ db: "midori_lrrna" ])
+        channel.from([ db: "midori_lrrna" ])
     )
     ch_midori_dbs = ch_midori_dbs.mix(DOWNLOAD_MIDORI_LRRNA.out.db)
 
     // Download Midori lrRNA database
     DOWNLOAD_MIDORI_SRRNA(
-        Channel.from([ db: "midori_srrna" ])
+        channel.from([ db: "midori_srrna" ])
     )
     ch_midori_dbs = ch_midori_dbs.mix(DOWNLOAD_MIDORI_SRRNA.out.db)
 
     // Download Midori Cytb database
     DOWNLOAD_MIDORI_CYTB(
-        Channel.from([ db: "midori_cytb" ])
+        channel.from([ db: "midori_cytb" ])
     )
     ch_midori_dbs = ch_midori_dbs.mix(DOWNLOAD_MIDORI_CYTB.out.db)
 
     // Download Midori CO1 database
     DOWNLOAD_MIDORI_CO1(
-        Channel.from([ db: "midori_co1" ])
+        channel.from([ db: "midori_co1" ])
     )
     ch_midori_dbs = ch_midori_dbs.mix(DOWNLOAD_MIDORI_CO1.out.db)
 
     // Download Midori CO2 database
     DOWNLOAD_MIDORI_CO2(
-        Channel.from([ db: "midori_co2" ])
+        channel.from([ db: "midori_co2" ])
     )
     ch_midori_dbs = ch_midori_dbs.mix(DOWNLOAD_MIDORI_CO2.out.db)
 
     // Download Midori CO3 database
     DOWNLOAD_MIDORI_CO3(
-        Channel.from([ db: "midori_co3" ])
+        channel.from([ db: "midori_co3" ])
     )
     ch_midori_dbs = ch_midori_dbs.mix(DOWNLOAD_MIDORI_CO3.out.db)
 
     DOWNLOAD_MITOFISH(
-        Channel.from([ db: "mitofish" ])
+        channel.from([ db: "mitofish" ])
     )
 
     // Download metafish-lib
     DOWNLOAD_METAFISH(
-        Channel.from([ db: "metafish" ])
+        channel.from([ db: "metafish" ])
     )
 
     // Import midori databases into crabs format

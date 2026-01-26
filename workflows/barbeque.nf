@@ -14,23 +14,24 @@ include { HELPER_CLUSTER_CONSENSUS }    from './../modules/helper/cluster_consen
 include { STAGE_FILE as STAGE_SAMPLESHEET } from './../modules/helper/stage_file'
 include { HELPER_CONSENSUS_HISTOGRAM }  from './../modules/helper/consensus_histogram'
 include { HELPER_TAXONOMIC_COVERAGE }   from './../modules/helper/taxonomic_coverage'
+include { HELPER_CONSENSUS_DISTRIBUTION } from './../modules/helper/consensus_distribution'
 
 workflow BARBEQUE {
 
     main:
 
-    ch_multiqc_config = params.multiqc_config   ? Channel.fromPath(params.multiqc_config, checkIfExists: true).collect() : Channel.value([])
-    ch_multiqc_logo   = params.multiqc_logo     ? Channel.fromPath(params.multiqc_logo, checkIfExists: true).collect() : Channel.value([])
+    ch_multiqc_config = params.multiqc_config   ? channel.fromPath(params.multiqc_config, checkIfExists: true).collect() : channel.value([])
+    ch_multiqc_logo   = params.multiqc_logo     ? channel.fromPath(params.multiqc_logo, checkIfExists: true).collect() : channel.value([])
 
-    ch_versions = Channel.from([])
-    multiqc_files = Channel.from([])
+    ch_versions = channel.from([])
+    multiqc_files = channel.from([])
 
-    samplesheet = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
+    samplesheet = params.input ? channel.fromPath(file(params.input, checkIfExists:true)) : channel.value([])
 
     // The pre-installed taxdump folder
     ch_taxdump = file(params.references.taxdump)
 
-    pipeline_settings = Channel.fromPath(dumpParametersToJSON(params.outdir)).collect()
+    pipeline_settings = channel.fromPath(dumpParametersToJSON(params.outdir)).collect()
 
     // Check if the specified taxon is valid
     if (params.taxon) {
@@ -43,7 +44,7 @@ workflow BARBEQUE {
 
     // the database to use - either pre-installed or user-provided
     // Pre-installed can be a list, coma-separated:  db1,db2,db3
-    ch_dbs = Channel.from([])
+    ch_dbs = channel.from([])
     these_dbs = []
     if (params.custom_db) {
         these_dbs <<  [ [ "id": "custom" ], file(params.custom_db, checkIfExists: true) ]
@@ -57,7 +58,7 @@ workflow BARBEQUE {
             these_dbs << [ ["id": db, ], file(params.references.databases[db].db, checkIfExists: true)  ]
         }
     }
-    ch_dbs = Channel.fromList(these_dbs)
+    ch_dbs = channel.fromList(these_dbs)
 
     // Check if the samplesheet is valid
     INPUT_CHECK(samplesheet)
@@ -121,6 +122,13 @@ workflow BARBEQUE {
         ch_taxdump
     )
     ch_versions = ch_versions.mix(HELPER_CLUSTER_CONSENSUS.out.versions)
+
+    // Amplicon size distribution
+    HELPER_CONSENSUS_DISTRIBUTION(
+        HELPER_CLUSTER_CONSENSUS.out.txt
+    )
+    ch_versions = ch_versions.mix(HELPER_CONSENSUS_DISTRIBUTION.out.versions)
+    multiqc_files = multiqc_files.mix(HELPER_CONSENSUS_DISTRIBUTION.out.json)
 
     // convert the consensus file into a histogram of amplicon lengths
     HELPER_CONSENSUS_HISTOGRAM(
