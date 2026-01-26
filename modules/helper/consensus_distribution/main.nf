@@ -9,7 +9,7 @@ process HELPER_CONSENSUS_DISTRIBUTION {
         'quay.io/biocontainers/multiqc:1.21--pyhdfd78af_0' }"
 
     input:
-    tuple val(meta), path(tsv)
+    tuple val(meta), path(tsv), path(db)
 
     output:
     tuple val(meta), path('*.json')             , emit: json
@@ -21,6 +21,7 @@ process HELPER_CONSENSUS_DISTRIBUTION {
     """
     barbeque_size_distro.py \
     --input $tsv \
+    --database $db \
     --output ${prefix}_distribution_mqc.json
 
     cat <<-END_VERSIONS > versions.yml

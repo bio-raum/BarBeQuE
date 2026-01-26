@@ -123,9 +123,19 @@ workflow BARBEQUE {
     )
     ch_versions = ch_versions.mix(HELPER_CLUSTER_CONSENSUS.out.versions)
 
+    HELPER_CLUSTER_CONSENSUS.out.txt.map { m, t ->
+        tuple(m.db, m, t)
+    }.combine(
+        ch_dbs.map { n, d ->
+            tuple(n.id, d)
+        }, by: 0
+    ).map { k, m, t, d ->
+        tuple(m, t, d)
+    }.set { ch_cluster_with_db }
+
     // Amplicon size distribution
     HELPER_CONSENSUS_DISTRIBUTION(
-        HELPER_CLUSTER_CONSENSUS.out.txt
+        ch_cluster_with_db
     )
     ch_versions = ch_versions.mix(HELPER_CONSENSUS_DISTRIBUTION.out.versions)
     multiqc_files = multiqc_files.mix(HELPER_CONSENSUS_DISTRIBUTION.out.json)
