@@ -24,9 +24,10 @@ def main(input, database, output):
             "data": {}
             }
 
-    histo = {}
-    tax_count = {}
+    histo = {}  # the amplicon size distribution by taxonomic group
+    tax_count = {}  # The list of species per taxonomic group
 
+    # Parse the consensus file and collect data
     with open(input) as tsv:
         tsvreader = csv.DictReader(tsv, delimiter="\t")
 
@@ -50,28 +51,31 @@ def main(input, database, output):
             else:
                 tax_count[tax_class] = [species]
 
+    # Iterate the amplicon distribution
     for tgroup, counts in histo.items():
 
-        # Read the database to get all possible species entries for this class
+        # Read the database to get all possible species entries for this taxonomic class
         known = []
         with open(database, "r") as db:
             for l_no, this_line in enumerate(db):
                 if tgroup in this_line:
-                    species = this_line.split("\t")[2]
+                    species = this_line.split("\t")[1]
                     known.append(species)
 
-        total_species = len(list(set(known)))
-        seen_species = len(list(set(tax_count[tgroup])))
+        total_species = len(list(set(known)))  # unique species in database
+        seen_species = len(list(set(tax_count[tgroup])))  # unique species in consensus file
 
-        values = []
+        amplicon_lengths = []
+        # amplicon length vs observed counts
         for this_len, this_count in counts.items():
 
             for i in range(this_count):
-                values.append(this_len)
+                amplicon_lengths.append(this_len)
 
-        if len(values) > 10:
-            mean = round(statistics.mean(values), 0)
-            stddev = statistics.stdev(values)
+        # We ommit all taxa for which less than 10 measurements are present
+        if len(amplicon_lengths) > 10:
+            mean = round(statistics.mean(amplicon_lengths), 0)
+            stddev = round(statistics.stdev(amplicon_lengths), 2)
 
             # We assume that our counts correspond to number of species 
             # so we can compare this number to the total number of species for this tax group in the database
