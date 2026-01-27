@@ -23,7 +23,9 @@ def main(input, primer, db, output):
             "data": {}
             }
 
-    histo = {}
+    histo = {}  # The basic histogram
+    histo_normalized  = {}  # The histogram, each taxonomic class normalized to 100%
+    all_lengths = []
 
     with open(input) as tsv:
         tsvreader = csv.DictReader(tsv, delimiter="\t")
@@ -31,6 +33,7 @@ def main(input, primer, db, output):
         for entry in tsvreader:
             amlen = len(entry["amplicon"])
             tax_class = entry["class"]
+            all_lengths.append(amlen)
 
             if tax_class in histo:
 
@@ -42,6 +45,31 @@ def main(input, primer, db, output):
             else:
 
                 histo[tax_class] = {amlen: 1}
+
+    
+    sorted(list(set(all_lengths)))
+    print(all_lengths)
+
+    for tclass, counts in histo.items():
+
+        total_counts = 0
+
+        for ampl_len, ampl_count in counts.items():
+            all_lengths.append(ampl_len)
+
+            total_counts += int(ampl_count)
+
+        histo_normalized[tclass] = {}
+
+        for this_len in all_lengths:
+
+            if this_len in counts:
+                ampl_count = counts[this_len]
+            else:
+                ampl_count = 0.0
+
+            this_perc = 100 * round(int(ampl_count) / total_counts, 2)
+            histo_normalized[tclass][this_len] = float(this_perc)
 
     data["data"] = histo
 

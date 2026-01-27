@@ -17,10 +17,10 @@ args = parser.parse_args()
 def main(input, database, output):
 
     data = {"id": "amplicon_mean_size",
-            "section_name": "Amplicon mean length by taxonomic group",
+            "section_name": "Amplicon metrics across taxonomic groups",
             "description": "Mean length and std-dev of amplicons per taxonomic group",
             "plot_type": "table",
-            "pconfig": {"id": "amp_mean_size", "col1_header": "Taxon"},
+            "pconfig": {"id": "amp_mean_size", "col1_header": "Taxon", "col2_header": "Mean amplicon length" },
             "data": {}
             }
 
@@ -74,6 +74,7 @@ def main(input, database, output):
 
         # We ommit all taxa for which less than 10 measurements are present
         if len(amplicon_lengths) > 10:
+
             mean = round(statistics.mean(amplicon_lengths), 0)
             stddev = round(statistics.stdev(amplicon_lengths), 2)
 
@@ -81,7 +82,7 @@ def main(input, database, output):
             # so we can compare this number to the total number of species for this tax group in the database
             tax_cov = 100 * round(seen_species / total_species, 2)
 
-            data["data"][tgroup] = {"Mean amplicon length": mean, "Stddev": stddev, "Taxonomic coverage": tax_cov}
+            data["data"][tgroup] = {"Mean amplicon length": mean, "Stddev": stddev, "Database coverage": tax_cov}
 
     with open(output, "w") as json_out:
         json.dump(data, json_out, indent=4, sort_keys=True)
