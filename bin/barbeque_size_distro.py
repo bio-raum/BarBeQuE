@@ -19,7 +19,7 @@ def main(input, database, output):
             "section_name": "Amplicon metrics across taxonomic groups",
             "description": "Mean length and std-dev of amplicons per taxonomic group",
             "plot_type": "table",
-            "pconfig": {"id": "amp_mean_size", "col1_header": "Taxon", "col2_header": "Mean amplicon length" },
+            "pconfig": {"id": "amp_mean_size", "col1_header": "Taxon", "col2_header": "Mean amplicon length"},
             "data": {}
             }
 
