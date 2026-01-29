@@ -16,12 +16,14 @@ custom_data:
         headers:
             Mean amplicon length:
                 description: 'Mean length of the amplified sequences'
+                format: '{:,.0f}'
             Stddev:
                 description: 'Standard deviation'
             Database coverage:
                 description: 'Fraction of database entries amplifiable'
             Database size:
                 description: 'Total number of database entries'
+                format: '{:,.0f}'
 report_comment: >
     This report has been generated automatically by bio-raum/BarBeQue.
     For help interpreting the outputs, please see: https://github.com/bio-raum/BarBeQue
