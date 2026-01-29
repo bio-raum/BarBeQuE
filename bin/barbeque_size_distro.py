@@ -5,7 +5,6 @@ import argparse
 import csv
 import json
 import statistics
-import subprocess
 
 parser = argparse.ArgumentParser(description="Script options")
 parser.add_argument("--input", help="A BarBeQue consensus file in tab format")
@@ -82,7 +81,7 @@ def main(input, database, output):
             # so we can compare this number to the total number of species for this tax group in the database
             tax_cov = 100 * round(seen_species / total_species, 2)
 
-            data["data"][tgroup] = {"Mean amplicon length": mean, "Stddev": stddev, "Database coverage": tax_cov}
+            data["data"][tgroup] = {"Mean amplicon length": mean, "Stddev": stddev, "Database coverage": tax_cov, "Database size": total_species}
 
     with open(output, "w") as json_out:
         json.dump(data, json_out, indent=4, sort_keys=True)
