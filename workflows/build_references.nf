@@ -10,7 +10,15 @@ include { CRABS_DOWNLOADDB as DOWNLOAD_MIDORI_CO2 }     from './../modules/crabs
 include { CRABS_DOWNLOADDB as DOWNLOAD_MIDORI_CO3 }     from './../modules/crabs/download_db'
 include { CRABS_DOWNLOADDB as DOWNLOAD_MITOFISH }       from './../modules/crabs/download_db'
 include { CRABS_DOWNLOADDB as DOWNLOAD_METAFISH }       from './../modules/crabs/download_db'
+include { CRABS_DOWNLOADDB as DOWNLOAD_SILVA_16S }      from './../modules/crabs/download_db'
+include { CRABS_DOWNLOADDB as DOWNLOAD_GREENGENES }     from './../modules/crabs/download_db'
+include { CRABS_DOWNLOADDB as DOWNLOAD_SILVA_18S }      from './../modules/crabs/download_db'
+include { CRABS_DOWNLOADDB as DOWNLOAD_GREENGENES2 }    from './../modules/crabs/download_db'
 include { CRABS_IMPORT as CRABS_IMPORT_MIDORI   }       from './../modules/crabs/import'
+include { CRABS_IMPORT as CRABS_IMPORT_SILVA_16S   }    from './../modules/crabs/import'
+include { CRABS_IMPORT as CRABS_IMPORT_SILVA_18S   }    from './../modules/crabs/import'
+include { CRABS_IMPORT as CRABS_IMPORT_GREENGENES   }   from './../modules/crabs/import'
+include { CRABS_IMPORT as CRABS_IMPORT_GREENGENES2   }  from './../modules/crabs/import'
 include { CRABS_IMPORT as CRABS_IMPORT_MITOFISH   }     from './../modules/crabs/import'
 include { CRABS_IMPORT as CRABS_IMPORT_METAFISH   }     from './../modules/crabs/import'
 include { CRABS_IMPORT as CRABS_IMPORT_REFSEQ   }       from './../modules/crabs/import'
@@ -42,6 +50,25 @@ workflow BUILD_REFERENCES {
             meta.id = f.getSimpleName()
             tuple(meta, f)
         }
+    )
+
+    // Download Silva db
+    DOWNLOAD_SILVA_16S(
+        channel.from([db: "silva_16S"])
+    )
+
+    DOWNLOAD_SILVA_18S(
+        channel.from([db: "silva_18S"])
+    )
+
+    // Download Greengenes database
+    DOWNLOAD_GREENGENES(
+        channel.from([db: "greengenes"])
+    )
+
+    // Download Greengenes2 database
+    DOWNLOAD_GREENGENES2(
+        channel.from([db: "greengenes2"])
     )
 
     // Download the NCBI taxonomy
@@ -92,6 +119,28 @@ workflow BUILD_REFERENCES {
     // Download metafish-lib
     DOWNLOAD_METAFISH(
         channel.from([ db: "metafish" ])
+    )
+    // Import Silva db
+    CRABS_IMPORT_SILVA_16S(
+        DOWNLOAD_SILVA_16S.out.db,
+        CRABS_DOWNLOADTAXONOMY.out.taxonomy.collect()
+    )
+
+    CRABS_IMPORT_SILVA_18S(
+        DOWNLOAD_SILVA_18S.out.db,
+        CRABS_DOWNLOADTAXONOMY.out.taxonomy.collect()
+    )
+
+    // Import Greengenes database
+    CRABS_IMPORT_GREENGENES(
+        DOWNLOAD_GREENGENES.out.db,
+        CRABS_DOWNLOADTAXONOMY.out.taxonomy.collect()
+    )
+
+    // Import Greengenes2 database
+    CRABS_IMPORT_GREENGENES2(
+        DOWNLOAD_GREENGENES2.out.db,
+        CRABS_DOWNLOADTAXONOMY.out.taxonomy.collect()
     )
 
     // Import midori databases into crabs format

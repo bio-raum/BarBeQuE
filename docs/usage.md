@@ -97,12 +97,13 @@ A descriptive name for this analysis run. Should be a single word without specia
 
 List all pre-installed databases and exit. Some examples include:
 
-| Name | Description |
-| ---- | ----------- |
-| refseq_mito | The RefSeq dataset of mitochondrial genomes (v1.1) |
-| midori_lrna | The lrRNA database from MIDORI (aka 16S) |
-| midori_cytb | The CYTB database from MIDORI |
-| mitofish | The Mitofish database |
+| Name | Description | Taxonomy |
+| ---- | ----------- | -------- |
+| refseq_mito | The RefSeq dataset of mitochondrial genomes (v1.1) | Eukaryotes |
+| midori_lrna | The lrRNA database from MIDORI (aka 16S) |  Eukaryotes |
+| midori_cytb | The CYTB database from MIDORI | Eukaryotes |
+| mitofish | The Mitofish database | Fish |
+| silva_16S | Silva 16S database | Bacteria |
 
 ## Expert options
 
@@ -138,4 +139,4 @@ For the moment, the pipeline cannot validate your taxon argument and will either
 
 ### `--crabs_insilicopcr_options` [ default = null ]
 
-Pass custom options to the insilico PCR stage of the CRABS analysis. This may be used to e.g. increase to decrease the number of allowed mismatched bases (`--mismatch 2`). 
+Pass custom options to the insilico PCR stage of the CRABS analysis. This may be used to e.g. increase or decrease the number of allowed mismatched bases (`--mismatch 2`). 

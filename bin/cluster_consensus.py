@@ -28,8 +28,8 @@ def parse_crabs(table):
     crabs = {}
     with open(table, 'r') as fi:
         for line in fi.readlines():
-            l = line.split('\t')
-            crabs[l[0]] = l[1:]
+            elements = line.split('\t')
+            crabs[elements[0]] = elements[1:]
     return crabs
 
 
@@ -43,17 +43,17 @@ def main(clusters, table, taxdump, output):
     clusters_seqid, clusters_taxid = {}, {}
     with open(clusters, 'r') as fi:
         for line in fi.readlines():
-            l = line.split('\t')
-            if l[0] == 'C':
+            elements = line.split('\t')
+            if elements[0] == 'C':
                 continue
-            clusters_seqid[l[8]] = l[1]  # SeqID -> ClusterID
-            clusters_taxid.setdefault(l[1], [])
-            clusters_taxid[l[1]].append(crabs[l[8]][1])  # ClusterID -> taxid list
+            clusters_seqid[elements[8]] = elements[1]  # SeqID -> ClusterID
+            clusters_taxid.setdefault(elements[1], [])
+            clusters_taxid[elements[1]].append(crabs[elements[8]][1])  # ClusterID -> taxid list
 
     # Get consensus, rank, and disambiguation
     clusters_cons = {}
     for k, v in clusters_taxid.items():
-        # Only get unique taxa for the disambiguation
+        # Only get unique taxa for the disambiguation; limit to 20, else CSV parsing explodes
         disambiguation = ";".join([tax.getName(t) for t in list(dict.fromkeys(v))])
         cons = tax.lca(v, ignore_missing=True)
         clusters_cons[k] = [

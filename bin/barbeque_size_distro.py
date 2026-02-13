@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import csv
 import json
 import statistics
 
@@ -27,13 +26,16 @@ def main(input, database, output):
     tax_count = {}  # The list of species per taxonomic group
 
     # Parse the consensus file and collect data
-    with open(input) as tsv:
-        tsvreader = csv.DictReader(tsv, delimiter="\t")
+    with open(input) as infile:
 
-        for entry in tsvreader:
-            amlen = len(entry["amplicon"])
-            tax_class = entry["class"]
-            species = entry["species"]
+        for line in infile:
+            if "SeqID" in line:
+                continue
+
+            elements = line.split("\t")
+            amlen = len(elements[-1])
+            tax_class = elements[6]
+            species = elements[9]
 
             if tax_class in histo:
 

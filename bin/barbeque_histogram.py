@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import csv
 import json
 
 parser = argparse.ArgumentParser(description="Script options")
@@ -24,15 +23,16 @@ def main(input, primer, db, output):
             }
 
     histo = {}  # The basic histogram
-    histo_normalized  = {}  # The histogram, each taxonomic class normalized to 100%
+    histo_normalized = {}  # The histogram, each taxonomic class normalized to 100%
     all_lengths = []
 
-    with open(input) as tsv:
-        tsvreader = csv.DictReader(tsv, delimiter="\t")
-
-        for entry in tsvreader:
-            amlen = len(entry["amplicon"])
-            tax_class = entry["class"]
+    with open(input) as infile:
+        for line in infile:
+            if "SeqID" in line:
+                continue
+            elements = line.split("\t")
+            amlen = len(elements[-1])
+            tax_class = elements[6]
             all_lengths.append(amlen)
 
             if tax_class in histo:
@@ -46,7 +46,6 @@ def main(input, primer, db, output):
 
                 histo[tax_class] = {amlen: 1}
 
-    
     sorted(list(set(all_lengths)))
     print(all_lengths)
 
