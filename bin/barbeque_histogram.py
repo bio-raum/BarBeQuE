@@ -26,13 +26,22 @@ def main(input, primer, db, output):
     histo_normalized = {}  # The histogram, each taxonomic class normalized to 100%
     all_lengths = []
 
+    # We do manual CSV parsing with header mapping as the built-in library
+    # struggles with outputs from bacterial screens
     with open(input) as infile:
-        for line in infile:
-            if "SeqID" in line:
-                continue
-            elements = line.split("\t")
-            amlen = len(elements[-1])
-            tax_class = elements[6]
+        lines = infile.readlines()
+
+        header = lines.pop(0).strip().split("\t")
+
+        for line in lines:
+
+            elements = line.strip().split("\t")
+            this_data = {}
+            for idx, h in enumerate(header):
+                this_data[h] = elements[idx]
+
+            amlen = len(this_data["amplicon"])
+            tax_class = this_data["class"]
             all_lengths.append(amlen)
 
             if tax_class in histo:

@@ -25,17 +25,24 @@ def main(input, database, output):
     histo = {}  # the amplicon size distribution by taxonomic group
     tax_count = {}  # The list of species per taxonomic group
 
-    # Parse the consensus file and collect data
+    # # We do manual CSV parsing with header mapping as the built-in library
+    # struggles with outputs from bacterial screens
     with open(input) as infile:
 
-        for line in infile:
-            if "SeqID" in line:
-                continue
+        lines = infile.readlines()
 
-            elements = line.split("\t")
-            amlen = len(elements[-1])
-            tax_class = elements[6]
-            species = elements[9]
+        header = lines.pop(0).strip().split("\t")
+
+        for line in lines:
+
+            elements = line.strip().split("\t")
+            this_data = {}
+            for idx, h in enumerate(header):
+                this_data[h] = elements[idx]
+
+            amlen = len(this_data["amplicon"])
+            tax_class = this_data["class"]
+            species = this_data["species"]
 
             if tax_class in histo:
 
