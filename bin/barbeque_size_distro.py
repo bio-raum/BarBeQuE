@@ -67,11 +67,15 @@ def main(input, database, output):
         with open(database, "r") as db:
             for l_no, this_line in enumerate(db):
                 if tgroup in this_line:
-                    species = this_line.split("\t")[1]
+                    species = this_line.split("\t")[9]
                     known.append(species)
 
         total_species = len(list(set(known)))  # unique species in database
         seen_species = len(list(set(tax_count[tgroup])))  # unique species in consensus file
+
+        if (seen_species > total_species):
+            print(f"{tgroup}\t{total_species}\t{seen_species}")
+            print(set(tax_count[tgroup]))
 
         amplicon_lengths = []
         # amplicon length vs observed counts
