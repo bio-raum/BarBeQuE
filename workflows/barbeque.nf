@@ -12,28 +12,39 @@ include { CRABS_AMPLIFICATION_EFFICENCY_FIGURE } from './../modules/crabs/amplif
 include { CRABS_AMPLICON_LENGTH_FIGURE }from './../modules/crabs/amplicon_length_figure'
 include { HELPER_CLUSTER_CONSENSUS }    from './../modules/helper/cluster_consensus'
 include { STAGE_FILE as STAGE_SAMPLESHEET } from './../modules/helper/stage_file'
+include { HELPER_CONSENSUS_HISTOGRAM }  from './../modules/helper/consensus_histogram'
 include { HELPER_TAXONOMIC_COVERAGE }   from './../modules/helper/taxonomic_coverage'
+include { HELPER_CONSENSUS_DISTRIBUTION } from './../modules/helper/consensus_distribution'
 
 workflow BARBEQUE {
 
     main:
 
-    ch_multiqc_config = params.multiqc_config   ? Channel.fromPath(params.multiqc_config, checkIfExists: true).collect() : Channel.value([])
-    ch_multiqc_logo   = params.multiqc_logo     ? Channel.fromPath(params.multiqc_logo, checkIfExists: true).collect() : Channel.value([])
+    ch_multiqc_config = params.multiqc_config   ? channel.fromPath(params.multiqc_config, checkIfExists: true).collect() : channel.value([])
+    ch_multiqc_logo   = params.multiqc_logo     ? channel.fromPath(params.multiqc_logo, checkIfExists: true).collect() : channel.value([])
 
-    ch_versions = Channel.from([])
-    multiqc_files = Channel.from([])
+    ch_versions = channel.from([])
+    multiqc_files = channel.from([])
 
-    samplesheet = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
+    samplesheet = params.input ? channel.fromPath(file(params.input, checkIfExists:true)) : channel.value([])
 
     // The pre-installed taxdump folder
     ch_taxdump = file(params.references.taxdump)
 
-    pipeline_settings = Channel.fromPath(dumpParametersToJSON(params.outdir)).collect()
+    pipeline_settings = channel.fromPath(dumpParametersToJSON(params.outdir)).collect()
+
+    // Check if the specified taxon is valid
+    if (params.taxon) {
+        taxon_valid = valid_taxon(params.taxon)
+        if (!taxon_valid) {
+          log.warn "Specified what appears to be an invalid taxon name - aborting!"
+          System.exit(1)
+        }
+    }
 
     // the database to use - either pre-installed or user-provided
     // Pre-installed can be a list, coma-separated:  db1,db2,db3
-    ch_dbs = Channel.from([])
+    ch_dbs = channel.from([])
     these_dbs = []
     if (params.custom_db) {
         these_dbs <<  [ [ "id": "custom" ], file(params.custom_db, checkIfExists: true) ]
@@ -47,7 +58,7 @@ workflow BARBEQUE {
             these_dbs << [ ["id": db, ], file(params.references.databases[db].db, checkIfExists: true)  ]
         }
     }
-    ch_dbs = Channel.fromList(these_dbs)
+    ch_dbs = channel.fromList(these_dbs)
 
     // Check if the samplesheet is valid
     INPUT_CHECK(samplesheet)
@@ -111,6 +122,30 @@ workflow BARBEQUE {
         ch_taxdump
     )
     ch_versions = ch_versions.mix(HELPER_CLUSTER_CONSENSUS.out.versions)
+
+    HELPER_CLUSTER_CONSENSUS.out.txt.map { m, t ->
+        tuple(m.db, m, t)
+    }.combine(
+        ch_dbs.map { n, d ->
+            tuple(n.id, d)
+        }, by: 0
+    ).map { k, m, t, d ->
+        tuple(m, t, d)
+    }.set { ch_cluster_with_db }
+
+    // Amplicon size distribution
+    HELPER_CONSENSUS_DISTRIBUTION(
+        ch_cluster_with_db
+    )
+    ch_versions = ch_versions.mix(HELPER_CONSENSUS_DISTRIBUTION.out.versions)
+    multiqc_files = multiqc_files.mix(HELPER_CONSENSUS_DISTRIBUTION.out.json)
+
+    // convert the consensus file into a histogram of amplicon lengths
+    HELPER_CONSENSUS_HISTOGRAM(
+        HELPER_CLUSTER_CONSENSUS.out.txt
+    )
+    multiqc_files = multiqc_files.mix(HELPER_CONSENSUS_HISTOGRAM.out.json)
+    ch_versions = ch_versions.mix(HELPER_CONSENSUS_HISTOGRAM.out.versions)
 
     // If a taxon is provided, perform additional visualisation/filtering
     if (params.taxon) {
@@ -176,10 +211,12 @@ workflow BARBEQUE {
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
-    multiqc_files = multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml)
+    // Combine by meta dict to generate separate reports for each primer-db combination
+    multiqc_by_set = multiqc_files.groupTuple(by: 0)
 
     MULTIQC(
-        multiqc_files.collect(),
+        multiqc_by_set,
+        CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
         ch_multiqc_config,
         ch_multiqc_logo
     )
@@ -199,4 +236,38 @@ def dumpParametersToJSON(outdir) {
     nextflow.extension.FilesEx.copyTo(temp_pf.toPath(), "${outdir}/pipeline_info/params_${timestamp}.json")
     temp_pf.delete()
     return file("${outdir}/pipeline_info/params_${timestamp}.json")
+}
+
+def valid_taxon(taxon) {
+    log.info "Checking if ${taxon} is a valid taxon.."
+
+    try {
+
+        def j = new groovy.json.JsonSlurper().parseText(new URL("https://rest.ensembl.org/taxonomy/name/${taxon.toString()}?content-type=application/json").getText())
+
+        if (j instanceof ArrayList) {
+            
+            def data = j[0]
+
+            // if we see this key, it means that the API was able to find a match in the database - we assume the taxon is valid. 
+            if (data.containsKey("scientific_name")) {
+                return true
+            }
+        // This is probably not needed, invalid taxa seem to raise a 400 error instead - see below. 
+        } else if (j.containsKey("error")) {
+            log.warn "Invalid taxon argument found!"
+            return false
+        }
+
+        return false // unspecified error
+
+    } catch(java.io.IOException ex) {
+        // Service returns error, probably invalid taxon argument.
+       return false
+    // any other error, most likely service unreachable
+    } catch(err) {
+        log.warn "Unspecified error encountered, assuming taxon is valid.."
+        return true
+    }
+
 }

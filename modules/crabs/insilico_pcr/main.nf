@@ -25,6 +25,7 @@ process CRABS_INSILICOPCR {
     crabs $args --in-silico-pcr \\
     --input $db \\
     --output ${prefix}_insilico.txt \\
+    --untrimmed ${prefix}_untrimmed.txt \\
     --forward ${meta.fwd} \\
     --reverse ${meta.rev} \\
     --threads ${task.cpus}

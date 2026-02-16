@@ -1,8 +1,8 @@
-title: "Pipeline report"
-subtitle: "Best-practice workflow for EDIT_IN_conf_multiqc_config.yaml"
+title: "BarBeQue report"
+subtitle: "Characterization of primers for metabarcoding"
 custom_logo: "pipelinelogo.png"
-custom_logo_title: "Pipeline title here"
-custom_logo_url: "http://www.github.com/marchoeppner"
+custom_logo_title: "BarBeQue"
+custom_logo_url: "http://www.github.com/bio-raum/BarBeQue"
 skip_versions_section: true
 
 extra_fn_clean_exts:
@@ -11,12 +11,24 @@ extra_fn_clean_exts:
     - _duplicate_metrics.txt
     - .pass
 
+custom_data:
+    amplicon_mean_size:
+        headers:
+            Mean amplicon length:
+                description: 'Mean length of the amplified sequences'
+                format: '{:,.0f}'
+            Stddev:
+                description: 'Standard deviation'
+            Database coverage:
+                description: 'Fraction of database entries amplifiable'
+            Database size:
+                description: 'Total number of database entries'
+                format: '{:,.0f}'
 report_comment: >
-    This report has been generated automatically by EDIT_IN_conf_multiqc_config.yaml.
-    For help interpreting the outputs, please see: https://github.com/marchoeppner/update_url
+    This report has been generated automatically by bio-raum/BarBeQue.
+    For help interpreting the outputs, please see: https://github.com/bio-raum/BarBeQue
 report_header_info:
-    - Contact E-mail: "you@gmail.com"
-    - Application Type: "EDIT_IN_conf_multiqc_config.yaml"
+    - Application Type: "Metabarcoding"
 
 top_modules:
     - 'general_stats'

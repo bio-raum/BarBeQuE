@@ -2,7 +2,7 @@ name: helper_taxonomic_coverage
 channels:
   - conda-forge
   - bioconda
-  - defaults
+  
 dependencies:
   - python=3.11
   - bioconda::grapetree=2.1

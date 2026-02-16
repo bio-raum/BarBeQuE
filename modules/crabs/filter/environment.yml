@@ -2,6 +2,6 @@ name: crabs_filter
 channels:
   - conda-forge
   - bioconda
-  - defaults
+  
 dependencies:
   - bioconda::crabs=1.14.0

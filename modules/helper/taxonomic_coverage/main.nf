@@ -7,8 +7,8 @@ process HELPER_TAXONOMIC_COVERAGE {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mob_suite:3.1.9--pyhdfd78af_1' :
-        'quay.io/biocontainers/mob_suite:3.1.9--pyhdfd78af_1' }"
+        'https://depot.galaxyproject.org/singularity/cladeomatic%3A0.1.1--pyhdfd78af_0' :
+        'quay.io/biocontainers/cladeomatic%3A0.1.1--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(clusters), path(db)
