@@ -15,6 +15,7 @@ include { STAGE_FILE as STAGE_SAMPLESHEET } from './../modules/helper/stage_file
 include { HELPER_CONSENSUS_HISTOGRAM }  from './../modules/helper/consensus_histogram'
 include { HELPER_TAXONOMIC_COVERAGE }   from './../modules/helper/taxonomic_coverage'
 include { HELPER_CONSENSUS_DISTRIBUTION } from './../modules/helper/consensus_distribution'
+include { CRABS_COMPUTE_BUFFER } from './../modules/crabs/compute_buffer'
 
 workflow BARBEQUE {
 
@@ -65,23 +66,25 @@ workflow BARBEQUE {
 
     // Copy the samplesheet to the results folder
     STAGE_SAMPLESHEET(samplesheet)
+    CRABS_COMPUTE_BUFFER()
 
     /*
      Combine each primer set with all requested databases
      [ meta, database_meta, database_path ]
     */
     INPUT_CHECK.out.primers.combine(ch_dbs).map { m,n,d ->
-        [
-            [ 
-                primer: m.primer,
-                fwd: m.fwd,
-                rev: m.rev,
-                min: m.min,
-                max: m.max,
-                db: n.id
-            ], d
-        ]
-    }.set { ch_primers_with_db }
+    [
+        [ 
+            primer: m.primer,
+            fwd: m.fwd,
+            rev: m.rev,
+            min: m.min,
+            max: m.max,
+            db: n.id
+        ], d
+    ]
+    }.combine(CRABS_COMPUTE_BUFFER.out).map 
+    { meta, db, buffersize ->[ meta + [buffersize: buffersize.toInteger()], db ]}.set { ch_primers_with_db }
 
     // perform insilico pcr, takes: [meta, database]
     CRABS_INSILICOPCR(

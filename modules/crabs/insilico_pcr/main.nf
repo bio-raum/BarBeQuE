@@ -28,6 +28,7 @@ process CRABS_INSILICOPCR {
     --untrimmed ${prefix}_untrimmed.txt \\
     --forward ${meta.fwd} \\
     --reverse ${meta.rev} \\
+    --buffer-size ${meta.buffersize} \\
     --threads ${task.cpus}
 
     cat <<-END_VERSIONS > versions.yml
