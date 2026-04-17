@@ -7,7 +7,7 @@ process CRABS_INSILICOPCR {
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/crabs:1.14.0--pyhdfd78af_0' :
-        'quay.io/biocontainers/crabs:1.14.0--pyhdfd78af_0' }"
+        'gregdenay/crabs:1.14.1' }"
 
     input:
     tuple val(meta), path(db)
@@ -28,6 +28,7 @@ process CRABS_INSILICOPCR {
     --untrimmed ${prefix}_untrimmed.txt \\
     --forward ${meta.fwd} \\
     --reverse ${meta.rev} \\
+    --buffer-size ${meta.buffersize} \\
     --threads ${task.cpus}
 
     cat <<-END_VERSIONS > versions.yml
