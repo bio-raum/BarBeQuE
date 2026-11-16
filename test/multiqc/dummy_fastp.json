@@ -1,8 +1,0 @@
-{
-  "command": "fastp -i test_R1.fastq -I test_R2.fastq -o test_R1.out.fastq -O test_R2.out.fastq",
-  "summary": {
-    "before_filtering": {
-      "total_reads": 100
-    }
-  }
-}
