@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -9,24 +8,23 @@ import plotly.graph_objects as go
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from cluster_pairwise_analysis import (  # noqa: E402
+from cluster_pairwise_analysis import (
     classical_pcoa,
     load_cluster_sequences,
     order_by_similarity,
 )
 
-
 st.set_page_config(page_title="Tea List Analysis", page_icon="📊", layout="wide")
 
 
-def get_results_dir() -> Optional[Path]:
+def get_results_dir() -> Path | None:
     """Return the results directory supplied to the Streamlit application."""
     if len(sys.argv) < 2:
         return None
     return Path(sys.argv[1]).expanduser().resolve()
 
 
-def get_data_path(results_dir: Path) -> Optional[Path]:
+def get_data_path(results_dir: Path) -> Path | None:
     """Return the supplied target list, or one published with this run."""
     if len(sys.argv) >= 3:
         supplied_path = Path(sys.argv[2]).expanduser().resolve()

@@ -20,6 +20,7 @@ from Bio import SeqIO
 from Bio.Data.IUPACData import ambiguous_dna_values
 from Bio.Seq import reverse_complement
 
+
 def accession(name):
     # BLAST drops a trailing ';' from the record name, so compare only the part before the first ';'
     # Example: AF218533;tax=k:Viridiplantae,...; -> AF218533
@@ -142,8 +143,7 @@ def write_mismatch_fasta(table, primers, prefix):
         rows = table[(table.primer == primer_name) & (table.status == "MISMATCH")]
         rows = rows.sort_values(["mismatches", "site"])
         with open(f"{prefix}.{primer_name}_mismatch_sites.fasta", "w") as out:
-            for i, primer in enumerate(primers[primer_name], start=1):
-                out.write(f">PRIMER_{primer_name}_{i}\n{primer}\n")
+            out.writelines(f">PRIMER_{primer_name}_{i}\n{primer}\n" for i, primer in enumerate(primers[primer_name], start=1))
             for row in rows.itertuples():
                 # "Curcuma longa internal transcribed spacer 2, ..." -> Curcuma_longa
                 # A hybrid keeps its third word: "Mentha x piperita ..." -> Mentha_x_piperita

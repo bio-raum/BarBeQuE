@@ -4,7 +4,6 @@ import argparse
 import csv
 import json
 
-
 FIELDS = [
     "Sequence_ID",
     "Amplicon_Length",

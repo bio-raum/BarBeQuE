@@ -1,7 +1,7 @@
 import csv
-from collections import Counter, defaultdict
 import json
 import sys
+from collections import Counter, defaultdict
 
 #headers of cluster consensus tsv
 headers = [

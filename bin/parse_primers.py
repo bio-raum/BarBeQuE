@@ -64,7 +64,6 @@ import re
 import sys
 from pathlib import Path
 
-
 # 1. IUPAC CODES
 
 # What each IUPAC symbol means.

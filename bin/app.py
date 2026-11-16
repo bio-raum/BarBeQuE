@@ -5,11 +5,8 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-import matplotlib.pyplot as plt
-from venn import venn
-
 from parse_obipcr import find_mismatches
- 
+
 # Configure the main Streamlit page settings (title and layout)
 st.set_page_config(page_title="Primer Cluster Taxonomy Dashboard", layout="wide")
  
@@ -534,8 +531,6 @@ else:
     st.success(f"Resolved taxon: {cluster_name}")
 
     st.dataframe(cluster_df, width="stretch", height=250)
-#
-#
 
 # Primer resolution efficiency
 

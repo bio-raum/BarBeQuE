@@ -13,7 +13,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 CONSENSUS_COLUMNS = [
     "cluster_id",
     "accession",

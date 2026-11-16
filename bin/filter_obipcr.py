@@ -9,8 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from mask import read_fasta
 from parse_obipcr import IUPAC
-from parse_primers import find_input_files, make_name_safe
-from parse_primers import read_fasta as read_primer_fasta, split_directions
+from parse_primers import find_input_files, make_name_safe, split_directions
+from parse_primers import read_fasta as read_primer_fasta
 
 
 # Read the obipcr JSON annotations after the first space of a header

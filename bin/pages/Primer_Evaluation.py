@@ -1,11 +1,12 @@
 import sys
 from pathlib import Path
-import pandas as pd
-import streamlit as st
+
 import matplotlib.pyplot as plt
-from venn import venn
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import streamlit as st
+from venn import venn
 
 st.set_page_config(page_title="Primer Evaluation (Multi-Primer Comparison)", layout="wide")
 

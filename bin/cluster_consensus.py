@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-import os
 import argparse
+import os
+
 import taxidTools
 
 
@@ -50,10 +50,9 @@ def parse_cluster_taxonomy(input_file):
     rows = []              # keep original rows for output
 
     with open(input_file, 'r') as fi:
-        for line in fi.readlines():
+        for line in fi:
             elements = line.rstrip('\n').split('\t')
             cluster_id = elements[0]
-            accession = elements[1]
             taxid = elements[2]
 
             clusters_taxid.setdefault(cluster_id, [])

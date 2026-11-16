@@ -5,7 +5,6 @@ import csv
 from collections import Counter, defaultdict
 from itertools import chain
 
-
 CONSENSUS_COLUMNS = [
     "cluster_id",
     "accession",
@@ -220,8 +219,7 @@ def calculate_cluster_sizes(cluster_sizes):
 
 def write_mqc_tsv(filename, config_lines, header, values):
     with open(filename, "w", newline="") as handle:
-        for line in config_lines:
-            handle.write(f"# {line}\n")
+        handle.writelines(f"# {line}\n" for line in config_lines)
 
         writer = csv.writer(handle, delimiter="\t")
         writer.writerow(header)

@@ -9,6 +9,7 @@ Usage:
 
 import argparse
 import os
+
 import taxidTools
 
 RANKS = ["kingdom", "phylum", "class", "order", "family", "genus", "species"]
