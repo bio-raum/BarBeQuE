@@ -3,6 +3,9 @@
 // Fetched and regex-parsed as plain text - never `includeConfig`'d or otherwise executed
 // as code - so using this catalog never hands code-execution trust to that repo.
 //
+
+import groovy.json.JsonOutput
+
 class PrimerCatalog {
 
     // Pin the catalog and referenced FASTAs so rebuilding the same pipeline revision
@@ -40,6 +43,20 @@ class PrimerCatalog {
 
     static String fastaUrl(String fastaName) {
         return "${BASE_URL}/assets/primers/${fastaName}"
+    }
+
+    // --list_primers: print the catalog as JSON and stop.
+    static void printCatalog(log) {
+        def catalog
+        try {
+            catalog = fetchCatalog()
+        }
+        catch (Exception e) {
+            log.error("Could not fetch the primer-set catalog from bio-raum/FooDMe2: ${e.message}")
+            System.exit(1)
+        }
+        println(JsonOutput.prettyPrint(JsonOutput.toJson(catalog)))
+        System.exit(1)
     }
 
     // Return one URL per unique primer FASTA used by the catalog.

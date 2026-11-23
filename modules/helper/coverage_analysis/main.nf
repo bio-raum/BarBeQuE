@@ -69,15 +69,19 @@ process COVERAGE_ANALYSIS {
 
     # List the records that have the region, each record once (even if several centroids hit it)
     # tail skips the header line, cut -f2 keeps the record column
+    # BLAST drops a trailing ';' from the record name (e.g. "MZ190997;tax=...;"), so the names
+    # are compared by the part before the first ';' only: cut -d';' -f1 here and
+    # --id-regexp in seqkit grep below. NCBI names like "MW812458.1" stay unchanged.
 
-    tail -n +2 ${meta.primer}_${name}.blast.tsv | cut -f2 | sort -u > with_region.txt
+    tail -n +2 ${meta.primer}_${name}.blast.tsv | cut -f2 | cut -d';' -f1 | sort -u > with_region.txt
 
     # Split the taxid FASTA into two files, with the full records unchanged
     # -f with_region.txt: keep the records in the list
     # -v: keep the records NOT in the list
+    # --id-regexp: the record name up to the first ';' or space
 
-    seqkit grep -f with_region.txt ${fasta} > ${meta.primer}_${name}.with_region.fasta
-    seqkit grep -v -f with_region.txt ${fasta} > ${meta.primer}_${name}.no_region.fasta
+    seqkit grep --id-regexp '^([^;\\s]+)' -f with_region.txt ${fasta} > ${meta.primer}_${name}.with_region.fasta
+    seqkit grep --id-regexp '^([^;\\s]+)' -v -f with_region.txt ${fasta} > ${meta.primer}_${name}.no_region.fasta
 
     # Count the records with the region
 
@@ -87,13 +91,13 @@ process COVERAGE_ANALYSIS {
     # Records, not amplicons: a record can give more than one amplicon, so each accession once
     # tail skips the header line, cut -f1 keeps the Sequence_ID column
 
-    tail -n +2 ${obipcr_tsv} | cut -f1 | sort -u > amplified.txt
-    amplified=\$(seqkit grep -f amplified.txt ${fasta} | grep -c '>' || true)
+    tail -n +2 ${obipcr_tsv} | cut -f1 | cut -d';' -f1 | sort -u > amplified.txt
+    amplified=\$(seqkit grep --id-regexp '^([^;\\s]+)' -f amplified.txt ${fasta} | grep -c '>' || true)
 
     # Records with the region that gave no amplicon (with_region minus amplified)
     # -v: keep the records NOT in the amplified list
 
-    seqkit grep -v -f amplified.txt ${meta.primer}_${name}.with_region.fasta > ${meta.primer}_${name}.with_barcode_not_amplified.fasta
+    seqkit grep --id-regexp '^([^;\\s]+)' -v -f amplified.txt ${meta.primer}_${name}.with_region.fasta > ${meta.primer}_${name}.with_barcode_not_amplified.fasta
     not_amplified=\$(grep -c '>' ${meta.primer}_${name}.with_barcode_not_amplified.fasta || true)
 
     echo -e "${meta.primer}\\t${taxid}\\t${taxon_name}\\t${rank}\\t\$records\\t\$with_region\\t\$amplified\\t\$not_amplified" >> ${meta.primer}_${name}.coverage.tsv

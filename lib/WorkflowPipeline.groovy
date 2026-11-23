@@ -2,8 +2,6 @@
 // This file holds functions to validate user-supplied arguments
 //
 
-import groovy.json.JsonOutput
-
 class WorkflowPipeline {
 
     //
@@ -32,18 +30,6 @@ class WorkflowPipeline {
                 println("Name: ${db}\tSource: ${info}")
                 println('---------------------------')
             }
-            System.exit(1)
-        }
-        if (enabled(params.list_primers)) {
-            def catalog
-            try {
-                catalog = PrimerCatalog.fetchCatalog()
-            }
-            catch (Exception e) {
-                log.error("Could not fetch the primer-set catalog from bio-raum/FooDMe2: ${e.message}")
-                System.exit(1)
-            }
-            println(JsonOutput.prettyPrint(JsonOutput.toJson(catalog)))
             System.exit(1)
         }
         if (!params.dbs && !params.custom_db && !enabled(params.build_references)) {
