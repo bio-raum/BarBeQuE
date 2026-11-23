@@ -41,6 +41,9 @@ workflow {
 
   validateParameters()
   WorkflowMain.initialise(workflow, params, log)
+  if (WorkflowPipeline.enabled(params.list_primers)) {
+      PrimerCatalog.printCatalog(log)
+  }
   WorkflowPipeline.initialise(params, log)
 
   // Print summary of supplied parameters
