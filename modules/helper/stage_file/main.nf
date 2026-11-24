@@ -3,8 +3,8 @@ process STAGE_FILE {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/multiqc:1.23--pyhdfd78af_0' :
-        'quay.io/biocontainers/multiqc:1.23--pyhdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/gawk:5.3.1' :
+        'quay.io/biocontainers/gawk:5.3.1' }"
 
     input:
     path(f)

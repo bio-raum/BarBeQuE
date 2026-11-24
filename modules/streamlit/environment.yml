@@ -1,0 +1,14 @@
+name: streamlit
+channels:
+  - conda-forge
+dependencies:
+  - coreutils
+  - matplotlib
+  - numpy
+  - pandas
+  - plotly
+  - procps-ng
+  - python=3.12
+  - sed
+  - streamlit
+  - venn

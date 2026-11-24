@@ -1,23 +1,69 @@
 # Versioning
 
-Scientific analyses should always be reproducible. This requires that not only the code is versioned, but also the reference data used (if any). 
+BarBeQuE reproducibility depends on three things:
 
-BarBeQue is versioned through github, including regular major and minor releases with specific feature sets and software versions.
+1. pipeline code version
+2. reference data version
+3. external database release dates
 
-However, BarBeQue also provides access to several reference databases, some of which are unforunately not versioned. 
+## Pipeline Version
 
-Specifically:
+Pin production runs by checking out a release tag in your clone:
 
-| Database | Versioned |
-| -------- | --------- |
-| All Midori databases | Yes |
-| Refseq Mitochondria | Yes |
-| Mitofish | No |
-| Meta-fish-lib | No |
+```bash
+git checkout <tag>
+nextflow run main.nf ...
+```
 
-Databases like Mitofish are downloaded 'on the day' representing whatever the state of the database is on the day you installed it. This is in contrast to e.g. Midori, which is versioned based on the GenBank release it was built from.
+Use release tags for published analyses. Use branches such as `main` only for development.
 
-At minimum, we recommend that you make a note of when you have installed the references so you can refer to it properly in any scientific publication you may create later on. You can also make a copy of the reference directoy after you 
-have installed all the databases to ensure that you are able to perfectly reproduce it in case your installation gets corrupted down the road. 
+## Reference Version
 
+Reference installs are scoped by:
 
+```bash
+--reference_version
+```
+
+Default:
+
+```text
+1.1
+```
+
+Installed paths use:
+
+```text
+<reference_base>/barbeque/<reference_version>/
+```
+
+Install a new reference version beside the old one instead of overwriting an existing analysis reference set.
+
+## Database Versions
+
+Some upstream databases are versioned, and some are effectively snapshots of whatever was current on installation day.
+
+Record at least:
+
+- BarBeQuE git tag or commit
+- `--reference_version`
+- `--midori_version`
+- date references were installed
+- selected `--dbs` or custom database filename/checksum
+- NCBI taxdump and accession mapping source/date
+
+## Recommended Run Metadata
+
+Keep the following with each analysis:
+
+```text
+nextflow run command
+pipeline version/tag
+reference_base
+reference_version
+midori_version
+database ids
+primer input file or primer_set names
+outdir
+run date
+```

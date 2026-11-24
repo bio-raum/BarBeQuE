@@ -1,0 +1,8 @@
+name: obipcr_report
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coreutils
+  - python=3.12
+  - sed

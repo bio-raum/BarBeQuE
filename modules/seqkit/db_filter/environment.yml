@@ -1,0 +1,9 @@
+name: db_filter
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coreutils
+  - grep
+  - sed
+  - seqkit=2.13.0

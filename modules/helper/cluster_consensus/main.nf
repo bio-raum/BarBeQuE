@@ -1,34 +1,32 @@
-process HELPER_CLUSTER_CONSENSUS {
+process CLUSTER_CONSENSUS {
 
     tag "${meta.primer}|${meta.db}"
-    label 'short_serial'
-
+    label 'medium_serial'
     conda "${moduleDir}/environment.yml"
-    container 'gregdenay/taxidtools:3.1.0'
 
     input:
-    tuple val(meta), path(clusters), path(filtered)
-    path(taxdump)
+    tuple val(meta), path(cluster_taxonomy)
+    path taxdump
 
     output:
-    tuple val(meta), path('*.consensus.txt')    , emit: txt
-    path 'versions.yml'                         , emit: versions
+    tuple val(meta), path("*.cluster_consensus.tsv"), emit: tsv
+    path "versions.yml", emit: versions
 
     script:
     def prefix = task.ext.prefix ?: "${meta.primer}_${meta.db}"
-
+    def args = task.ext.args ?: ''
     """
-    cluster_consensus.py \
-    --clusters $clusters \
-    --table $filtered \
-    --taxdump $taxdump \
-    --output ${prefix}.consensus.txt
+    set -euo pipefail
 
-    sed -i '1i SeqID\tSeq_name\tTaxid\tsuperkingdom\tphylum\tclass\torder\tfamily\tgenus\tspecies\tlca_name\tlca_taxid\tlca_rank\tcluster_members\tamplicon' ${prefix}.consensus.txt
+    cluster_consensus.py \\
+        --input ${cluster_taxonomy} \\
+        --taxdump ${taxdump} \\
+        --output ${prefix}.cluster_consensus.tsv ${args}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        python3: \$(python3 --version  | sed -e "s/Python //")
+        python: \$(python3 --version | sed 's/Python //')
+        taxidtools: \$(python3 -c "import taxidTools; print(taxidTools.__version__)" 2>/dev/null || echo "unknown")
     END_VERSIONS
     """
 }

@@ -1,0 +1,7 @@
+name: join_accession_taxonomy
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coreutils
+  - gawk

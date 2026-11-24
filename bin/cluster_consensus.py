@@ -1,18 +1,39 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-
-import os
 import argparse
+import os
+
 import taxidTools
 
 
-parser = argparse.ArgumentParser(description="Script options")
-parser.add_argument("--clusters", help="Path to VSearch clusters table")
-parser.add_argument("--table", help="Path to CRABS amplicon table")
-parser.add_argument("--taxdump", help="Path to tthe taxdump folder")
-parser.add_argument("--output", help="Path to output table")
-args = parser.parse_args()
+def consensus_fraction(value):
+    value = float(value)
+    if not 0.5 < value <= 1.0:
+        raise argparse.ArgumentTypeError(
+            "consensus fraction must be greater than 0.5 and at most 1.0"
+        )
+    return value
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="Assign taxonomy to sequence clusters")
+    parser.add_argument(
+        "--input",
+        required=True,
+        help="Path to cluster_taxonomy.tsv from JOIN_ACCESSION_TAXONOMY",
+    )
+    parser.add_argument("--taxdump", required=True, help="Path to the taxdump folder")
+    parser.add_argument("--output", required=True, help="Path to output table")
+    parser.add_argument(
+        "--min-consensus",
+        type=consensus_fraction,
+        default=1.0,
+        help=(
+            "Minimum fraction of valid cluster accessions that must support an "
+            "assignment (default: 1.0, equivalent to strict LCA)"
+        ),
+    )
+    return parser.parse_args(argv)
 
 
 def load_taxonomy(taxdump):
@@ -23,59 +44,86 @@ def load_taxonomy(taxdump):
     )
 
 
-def parse_crabs(table):
-    """parsing crabs in something more efficient than pandas"""
-    crabs = {}
-    with open(table, 'r') as fi:
-        for line in fi.readlines():
-            elements = line.split('\t')
-            crabs[elements[0]] = elements[1:]
-    return crabs
+def parse_cluster_taxonomy(input_file):
+    """Parse cluster_taxonomy.tsv (cluster_id, accession, taxid, phylum, class, order, family, genus, species)"""
+    clusters_taxid = {}    # cluster_id -> list of taxids
+    rows = []              # keep original rows for output
+
+    with open(input_file, 'r') as fi:
+        for line in fi:
+            elements = line.rstrip('\n').split('\t')
+            cluster_id = elements[0]
+            taxid = elements[2]
+
+            clusters_taxid.setdefault(cluster_id, [])
+            clusters_taxid[cluster_id].append(taxid)
+
+            rows.append(elements)
+
+    return clusters_taxid, rows
 
 
-def main(clusters, table, taxdump, output):
+def cluster_consensus(tax, taxids, min_consensus):
+    """Return name, taxid, rank, and input-taxon names for one cluster."""
+    unique_taxids = list(dict.fromkeys(taxids))
+    disambiguation = ";".join(
+        name
+        for name in (tax.getName(taxid) for taxid in unique_taxids)
+        if name is not None
+    )
+    valid_taxids = [taxid for taxid in taxids if tax.getName(taxid) is not None]
+
+    if not valid_taxids:
+        return ["Unclassified", "Unknown", "no rank", disambiguation]
+
+    consensus = tax.consensus(
+        valid_taxids,
+        min_consensus=min_consensus,
+        ignore_missing=True,
+    )
+    if consensus is None:
+        return ["Unclassified", "Unknown", "no rank", disambiguation]
+
+    return [
+        consensus.name,
+        str(consensus.taxid),
+        consensus.rank,
+        disambiguation,
+    ]
+
+
+def main(input_file, taxdump, output, min_consensus=1.0):
     tax = load_taxonomy(taxdump)
 
-    # Parse clusters and lookup taxid for seqid in crabs table, link cluster id to taxid in hashmap
-    crabs = parse_crabs(table)
+    # Parse input
+    clusters_taxid, rows = parse_cluster_taxonomy(input_file)
 
-    # Parse clusters
-    clusters_seqid, clusters_taxid = {}, {}
-    with open(clusters, 'r') as fi:
-        for line in fi.readlines():
-            elements = line.split('\t')
-            if elements[0] == 'C':
-                continue
-            clusters_seqid[elements[8]] = elements[1]  # SeqID -> ClusterID
-            clusters_taxid.setdefault(elements[1], [])
-            clusters_taxid[elements[1]].append(crabs[elements[8]][1])  # ClusterID -> taxid list
-
-    # Get consensus, rank, and disambiguation
+    # Get consensus, rank, and disambiguation per cluster
     clusters_cons = {}
-    for k, v in clusters_taxid.items():
-        # Only get unique taxa for the disambiguation; limit to 20, else CSV parsing explodes
-        disambiguation = ";".join([tax.getName(t) for t in list(dict.fromkeys(v))])
-        cons = tax.lca(v, ignore_missing=True)
-        clusters_cons[k] = [
-            cons.name,
-            cons.taxid,
-            cons.rank,
-            disambiguation,
-        ]
+    for cluster_id, taxids in clusters_taxid.items():
+        clusters_cons[cluster_id] = cluster_consensus(
+            tax,
+            taxids,
+            min_consensus,
+        )
 
-    # Dump
+    # Dump: original row + accession_name + LCA columns appended
     with open(output, 'w') as fo:
-        for k, v in crabs.items():
-            line = "\t".join([k, '\t'.join(v[:-1]), '\t'.join(clusters_cons[clusters_seqid[k]]), v[-1]])
-            fo.write(
-                line
-            )
+        for elements in rows:
+            cluster_id = elements[0]
+            accession_taxid = elements[2]
+            node = tax.get(accession_taxid)
+            accession_name = node.name if node else "Unknown"
+            
+            line = "\t".join(elements + [accession_name] + clusters_cons[cluster_id])
+            fo.write(line + "\n")
 
 
 if __name__ == "__main__":
+    args = parse_args()
     main(
-        args.clusters,
-        args.table,
+        args.input,
         args.taxdump,
-        args.output
+        args.output,
+        args.min_consensus,
     )

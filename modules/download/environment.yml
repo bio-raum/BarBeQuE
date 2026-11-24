@@ -1,0 +1,11 @@
+name: download
+channels:
+  - conda-forge
+dependencies:
+  - bash
+  - coreutils
+  - grep
+  - gzip
+  - python=3.12
+  - unzip
+  - wget

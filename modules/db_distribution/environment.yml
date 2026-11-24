@@ -1,0 +1,12 @@
+name: db_distribution
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coreutils
+  - numpy
+  - pandas
+  - plotly
+  - python=3.12
+  - sed
+  - taxidtools

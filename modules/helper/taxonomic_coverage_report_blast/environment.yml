@@ -1,0 +1,7 @@
+name: taxonomic_coverage_report_blast
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coreutils
+  - gawk

@@ -1,0 +1,6 @@
+name: makeblastdb
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - blast

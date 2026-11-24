@@ -1,0 +1,5 @@
+name: barbeque_settings
+channels:
+  - conda-forge
+dependencies:
+  - coreutils

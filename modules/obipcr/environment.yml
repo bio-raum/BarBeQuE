@@ -1,0 +1,9 @@
+name: obipcr
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coreutils
+  - obitools4=4.4.45
+  - sed
+  - seqkit=2.13.0

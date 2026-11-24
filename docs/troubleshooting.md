@@ -1,29 +1,78 @@
-# Common issues
+# Troubleshooting
 
-## A taxon I know to be detectable with my primer system is listed as not amplified?!
+## No Primer Input Was Accepted
 
-In-silico prediction of amplification can be affected by various factors, including the quality of the reference database. 
-Generally, BarBeQuE provides indications, but should not be taken as evidence for amplification or lack thereof. 
+Normal benchmarking requires exactly one primer source:
 
-## No results are returned when providing a specific taxon level
+- `--input <samplesheet.tsv>`
+- `--input <primer_fasta_directory>`
+- `--primer_set <name[,name...]>`
 
-When using the `--taxon` argument, please make sure that the taxon corresponds to one of the supported taxonomic levels.
+Do not combine `--input` and `--primer_set`.
 
-## My primer set is not predicted to amplify as expected
+## FASTA Input Fails
 
-Many reasons could contribute to failed in-silico amplification. Please make sure that:
-- You use a suitable reference database
-- The min and max arguments of your primer set are reasonable
+When `--input` is a primer FASTA, or a directory of them, provide global amplicon bounds:
 
-In addition, if you are using gene-specific databases (such as Midori), make sure that your primers bind within the target gene. If one or both primers 
-bind up-/downstream of the gene, that binding motif will not be included in the gene-level database and therefore no amplification can be predicted. When 
-in doubt, try using the `refseq_mito` database to produce some predicted amplicon sequences and blast these against a suitable database to see where they would map. 
+```bash
+--primer_min 100 --primer_max 500
+```
 
-## The Process HELPER_TAXONOMIC_COVERAGE times out
+A directory must contain `.fa`, `.fasta`, or `.fna` files; everything else in it is ignored.
 
-This process checks the taxa predicted to be amplified against all species belonging to the group you specified with `--taxon`. 
-The aim is to identify which members are detected by the respective primer set, which are not and which are missing from the database. 
-If this taxonomic group has too many members (= species), traversing the underlying phylogenetic tree will take a very long time - potentially 
-longer than the run time that is given to this process by default. Nextflow will repeat the job should it exceed this initial limit by doubling 
-the run time. Failing that, the runtime will be quadrupled. If the job still fails, the pipeline fails permanently. The only solution here 
-would be to repeat the analysis for multiple, more restricted taxonomic groups. 
+If a FASTA is rejected, the error names every unusable file at once and nothing is run. The
+causes are: no FASTA records in the file, a record with an empty sequence, a non-nucleotide
+character in a sequence, a prefix missing its forward or reverse primer, or a record with no
+`fwd`/`rev` token in a file that is not a plain two-record pair.
+
+A warning that a prefix "could not be collapsed" is not a failure - it means that prefix's
+variants have different lengths, so each forward/reverse combination is being benchmarked as its
+own primer set. Check `primers/` to see exactly what was run.
+
+## Accession Taxonomy Mapping Is Missing
+
+BarBeQuE needs accession-to-taxid data for taxonomy-aware steps. Provide either:
+
+```bash
+--reference_base /path/to/references
+```
+
+or:
+
+```bash
+--taxdump /path/to/new_taxdump \
+--accession_taxonomy /path/to/nucl_gb.accession2taxid
+```
+
+## Database Id Is Rejected
+
+Run:
+
+```bash
+nextflow run main.nf -profile conda --list_dbs --reference_base /path/to/references
+```
+
+Use ids exactly as shown. Prebuilt BLAST databases such as `core_nt` are not valid `--dbs` inputs for in-silico PCR.
+
+## No Amplicons Are Produced
+
+Common causes:
+
+- primers target a region absent from the selected database
+- `min` and `max` amplicon bounds are too strict
+- mismatch settings are too strict
+- gene-specific databases do not include primer binding sites outside the gene
+
+Try a broader database such as `refseq_mito` and inspect raw in-silico PCR output.
+
+## `--taxon` Runs Slowly
+
+Target-taxon coverage can be expensive for large groups because the workflow traverses taxonomy and checks many species. Use a narrower taxon when possible.
+
+## Full Test Runner Fails On Conda
+
+`run_all_tests.sh` executes Python tests first, then Nextflow module tests. The module tests require the selected process backend. If the run fails with `conda: command not found`, install Conda/Mamba or run with a container backend/profile where the module environments can be resolved.
+
+## Remote Config Include Fails
+
+`nextflow.config` includes a shared remote config by default. If your environment blocks network access, provide a local config with `-c` or adjust `params.custom_config_base` as appropriate for your deployment.

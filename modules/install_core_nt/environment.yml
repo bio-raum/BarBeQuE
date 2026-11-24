@@ -1,0 +1,6 @@
+name: install_core_nt
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - blast

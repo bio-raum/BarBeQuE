@@ -1,0 +1,7 @@
+name: parse_uc
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coreutils
+  - gawk

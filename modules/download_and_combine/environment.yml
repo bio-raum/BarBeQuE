@@ -1,0 +1,9 @@
+name: download_and_combine
+channels:
+  - conda-forge
+dependencies:
+  - bash
+  - coreutils
+  - grep
+  - gzip
+  - wget

@@ -1,0 +1,106 @@
+# Nextflow work directory
+work/
+.nextflow/
+.nextflow.log*
+.nextflow.pid
+.nextflow.cache/
+
+# Pipeline outputs
+results/
+output/
+outdir/
+
+# Database files
+*.fasta
+*.fa
+*.txt.gz
+*.fasta.gz
+flowering_plants_crabs*.txt
+*_insilico.txt
+*_untrimmed.txt
+
+# Taxonomy dumps
+nodes.dmp
+names.dmp
+*.dmp
+nucl_gb.accession2taxid*
+*.accession2taxid*
+
+# BLAST databases
+*.nhr
+*.nin
+*.nsq
+*.nsi
+*.nsd
+*.nog
+*.nog
+*.nal
+
+# Conda environments
+.conda/
+env/
+.conda-env/
+
+# Logs and reports
+nohup.out
+*.log
+*.err
+slurm-*.out
+trace*.txt
+report*.html
+timeline*.html
+dag*.html
+dag*.dot
+
+# Temp and cache
+tmp/
+temp/
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Custom config (may contain local paths)
+custom.config
+local.config
+results_its2/pipeline_info/pipeline_timeline.html
+results_its2/pipeline_info/pipeline_report.html
+results_its2/pipeline_info/pipeline_trace.txt
+results_its2/pipeline_info/pipeline_dag.dot
+
+*.tsv
+*.html
+*.uc
+*.svg
+pipeline_*
+# Run output directories (kept locally, never committed)
+its2/
+its2-*/
+results-*/
+rresults/
+tnrl_results/
+null/
+res/*.svg
+
+# Stray analysis scratch output
+commnet_*
+out.txt
+out.log
+output.tsv
+outliers_report_all.tsv
+vsearch_help.txt
+test_config.config
+test_*.fasta
+test_*.fa
+test_*.tsv

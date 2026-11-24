@@ -1,0 +1,6 @@
+name: taxonomic_coverage_blast
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - blast

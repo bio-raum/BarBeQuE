@@ -2,7 +2,11 @@ name: helper_taxonomic_coverage
 channels:
   - conda-forge
   - bioconda
-  
 dependencies:
-  - python=3.11
   - bioconda::grapetree=2.1
+  - coreutils
+  - ete3
+  - pandas
+  - plotly
+  - python=3.12
+  - sed

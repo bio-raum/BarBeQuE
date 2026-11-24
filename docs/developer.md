@@ -1,142 +1,78 @@
-# Developer's guide
+# Developer Guide
 
-This document is a brief overview of how to use this code base. Some understanding of Nextflow and how it implements DSL2 is assumed. 
+## Repository Layout
 
-## Editor
+| Path | Purpose |
+| --- | --- |
+| `main.nf` | Entry point and workflow router. |
+| `workflows/` | Top-level workflow implementations. |
+| `subworkflows/` | Reusable workflow chains. |
+| `modules/` | Process modules with tool calls and environments. |
+| `bin/` | Python, Perl, and shell helper scripts. |
+| `lib/` | Groovy helper classes for validation and pinned FooDMe2 asset access. |
+| `conf/` | Runtime, resource, module, and reference configuration. |
+| `docs/` | User and developer documentation. |
+| `tests/` | Python unit tests. |
+| `test/` | Nextflow module smoke-test harnesses and small fixtures. |
 
-We personally recommend [Microsoft Visual Studio Code](https://code.visualstudio.com/download) for working on nextflow pipelines. It's free and comes with a variety of free extensions to support your work. 
+## Parameter Validation
 
-This template specifically is set up to work with the following VS extensions:
+`lib/WorkflowPipeline.groovy` owns high-level user validation:
 
-- nextflow
-- prettier
-- groovy-lint
-- TODO highlight
-- Docker
+- `--list_dbs`
+- `--list_primers`
+- mutually exclusive primer input modes
+- required bounds for primer FASTA input (single file or directory)
+- `--run_name` requirement when `--dbs` is used
 
-## Basic concept
+Update this file when adding a user-facing parameter that changes valid run modes.
 
-This pipeline base is organized in the following way:
+## Config Files
 
-* `main.nf` - entry point into the pipeline, imports the core workflow from `workflow/<pipeline>.nf`
-* `workflow/<pipeline.nf>` - the actual core logic of the pipeline; imports sub-workflows from `subworkflow/<sub>.nf`
-* `subworkflow/<sub>.nf` - a self-contained processing chain that is part of the larger workflow (e.g. read alignment and dedup in a WGS calling workflow)
-* `modules/<module>.nf` - A command line tool/call that can be imported into a (sub)workflow. 
+- `nextflow.config`: top-level defaults, plugin setup, profiles, includes.
+- `conf/resources.config`: known reference databases and default installed paths.
+- `conf/reference_sources.config`: source URLs for installable references.
+- `conf/modules.config`: publish directories and process-specific arguments.
+- `conf/base.config`: default resources and retry policy.
+- `conf/modules/installation.config`: install workflow publish behavior.
 
-## Config files
+## Adding A Module
 
-Some aspects of this code base are controlled by config files. These are:
+1. Create `modules/<tool>/<task>/main.nf` or `modules/<tool>/main.nf`.
+2. Add an `environment.yml` or container declaration.
+3. Emit `versions.yml` and mix it into the parent workflow's version channel.
+4. Add publish rules in `conf/modules.config` if outputs are user-facing.
+5. Add a small test harness under `test/<module>/main.nf`.
+6. Add Python unit tests when the module wraps logic in `bin/`.
 
-/nextflow.config -  this sets some of the command line options and default values
+`PrimerCatalog.groovy` keeps remote primer assets pinned and reproducible.
+Analysis logic belongs in BarBeQuE modules; upstream workflow processes are not
+imported.
 
-/conf/resources.config - here you can put some pipeline-internal options, like locations of reference files and the like (assuming you use a generic base directory with fixed folder structure or S3 buckets)
+## Testing
 
-/conf/base.config - this file sets the computing specifications for different types of processes. 
+Python utility tests:
 
-/conf/lsh.config - this is an example of a site-specific config file (set as "standard" profile in nextflow.config), in which you can provide information about your compute environment. Make sure to create a new profile for it too. 
-
-## Groovy libraries
-
-This pipeline imports a few functions into the nextflow files from lib/ - mostly to keep the actual pipeline code a bit cleaner/more readable. For example, 
-the `--help` command line option can be found in lib/WorkflowMain.groovy. Likewise, you could use this approach to do some basic validation of your inputs etc. 
-
-## Bioconda/biocontainers
-
-By design, modules should provide software as either conda environment or container. See existing modules for how that can be achieved. 
-
-```
-conda 'bioconda::multiqc=1.19'
-container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-    'https://depot.galaxyproject.org/singularity/multiqc:1.19--pyhdfd78af_0' :
-    'quay.io/biocontainers/multiqc:1.19--pyhdfd78af_0' }"
-```
-
-What does this do? Basically, if conda is enabled as software provider, the specified package will be installed into a process-specific environment. Else, a container is pulled - where the source depends on whether you run Docker (native Docker image) or e.g. Singularity (dedicated singularity image).
-
-We normally use Bioconda as the source for software packages; either directly via conda or through containers that are built directly from Bioconda. You'll note that each Bioconda package lists the matching Biocontainer link. For convenience, it is recommended to provide links to the native Biocontainer Docker container as well as the singularity version hosted by the Galaxy team under [https://depot.galaxyproject.org/singularity/](https://depot.galaxyproject.org/singularity/).
-
-There are two situations where this approach will not work (directly). One is the use of multiple software packages in one pipeline process. While this can be done for conda-based provisioning by simply providing the name of multiple packages, it does not work for pre-built containers. Instead, you need a so-called "mulled" container; which are built from two or more Bioconda packages - described [here](https://github.com/BioContainers/multi-package-containers). Sometimes you can be lucky and find existing mulled containers that do what you need. Else - see the description above. 
-
-If mulling containers is not an option, you can also refer to github actions and have the pipeline built its own mulled container. For that, see the section about Docker below. 
-
-## Github workflows
-
-Github supports the automatic execution of specific tasks on code branches, such as the automatic linting of the code base or building and pushing of Docker containers. To add github workflows to your repository, place them into the sub-directory `.github/workflows`. 
-
-### Linting
-
-Nextflow does not have a dedicated linting tool. However, since most of nextflow is actually Groovy, the groovy linting suite works just fine, I find. Linting is set up as an automatic workflow for every push to the TEMPLATE and dev branch as well as pull requests. You may wish to run this stand-alone also, before you commit your code. I would strongly recommend setting this up in a [conda](https://github.com/conda-forge/miniforge) environment, but it should also work on your *nix system directly (albeit with some minor pitfalls re: java version). 
-
-```
-conda create -n nf-lint nodejs openjdk=17.0.10
-conda activate nf-lint
-npm install -g npm-groovy-lint
+```bash
+python3 -m unittest discover -s tests -p 'test*.py' -v
 ```
 
-In your pipeline directory, you can check all the files in one go as follows:
+Full smoke-test runner:
 
-```
-npm-groovy-lint
-```
-
-You'll note that some obvious errors/warnings are omitted. This behavior is controlled by the settings in .groovylintrc [documentation](https://www.npmjs.com/package/npm-groovy-lint), included with this template. If you need to switch on some stuff, just add it the config file - and vice-versa.
-
-Make sure that the local linting produces *no* messages (info, warning, error) or the automatic action will throw an error and flag the commit as "failed linting". This is not a deal breaker, but in principle should be fixed before merging into the `main` branch. 
-
-## How to start
-
-1. Create a new repository and use this template 
-
-![](../images/github_template.png)
-
-2. Checkout the new repository
-
-After checking out the repo, create a branch "dev" as well as "main"
-
-```
-git branch dev
-git branch main
-```
-With these branches created, switch to the dev branch and start developing.
-
-```
-git checkout dev
+```bash
+bash run_all_tests.sh
 ```
 
-3. Go through the source files and address the sections marked with `//TODO`
+The full runner needs Nextflow plus the selected software backend. In a minimal development shell, the Python suite may pass while module tests fail because Conda or containers are unavailable.
 
-- Update `nextflow.config' with the name and version of your pipeline, required nextflow version and so on
-- Rename the main workflow file and workflow definition to match your pipeline topic (and update main.nf accordingly)
-- If you want to provision a pipeline-specific Docker container
-  - rename dot_github to .github
-  - Create a dockerhub project for this pipeline
-  - Update the github actions to the name of the dockerhub project 
+## Documentation
 
-  IMPORTANT: When you rename files in a git project, use `git mv`, not plain `mv` to avoid breaking the built-in file tracking of your git repo!
+When changing workflow behavior, update:
 
-4. Outline your primary workflow logic in `workflow/<pipeline.nf>` 
+- `docs/usage.md` for user-facing parameters
+- `docs/pipeline.md` for top-level routing changes
+- `docs/barbeque.md` for normal analysis changes
+- `docs/output.md` for publish directory or output schema changes
+- `nextflow_schema.json` for parameter help
 
-5. Start outlining your subworkflows, if any, in `subworkflows/<subworkflow.nf>`
-
-6. Build all the necessary modules in `modules/`, using `modules/fastp/main.nf` as a template
-   - Use a subfolder for each software package and folders therein for sub-functions of a given tool (e.g. samtools)
-   - Each module should include a `conda/container` statement to specify which software package is to be used
-   - Each module should collect information on the software version(s) of the tools used - see existing modules for examples. 
-
-## How to test
-
-It is very much recommended to implement a simple test suite for your pipeline. 
-
-A default test profile is already included with this code base - you simply have to update the inputs. These inputs should consist of a highly reduced data set that can be processes in a very short amount of time. An example would be short read data from a small section of the genome only (which you could, for example, extract from a BAM file using coordinates). You get the idea. We try to keep test data in a [shared repository](https://github.com/marchoeppner/nf-testdata) - you might find something you can use in there, or you could add your own data set. Remember, git has a hard-limit of 50MB for individual files. 
-
-To run the test, the syntax would be:
-
-```
-nextflow run my/pipeline -profile standard,test
-```
-
-Here, standard refers to the default site configuration ('standard') - change it if you need to run this pipeline under a different profile. 
-
-## Sending report emails
-
-This template is set up to send the final QC report via Email (--email you@gmail.com). This requires for sendmail to be configured on the executing node/computer. 
+Keep examples executable and avoid documenting parameters that are not wired into `main.nf` or `nextflow_schema.json`.

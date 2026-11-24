@@ -1,7 +1,54 @@
-# Pipeline structure
+# Pipeline Workflow
 
-The pipeline accepts one or several sets of metabarcoding primers and predicts the amplification status of species using one or several reference database(s). 
+`main.nf` validates the parameters and then runs one of two modes.
 
-First, the primers are used to perform in-silico PCR on a given database. The results are then dereplicated and filtered (by size range) and used to calculate some useful metrics. In addition, if users specify a target taxon to profile, BarBeQue will check - for all species known to belong to that group via the NCBI taxonomy database - if that species is amplified, not amplified or missing from the database. For all hits, the users is furthermore provided with a list of any additional taxa with an identical barcode sequence (ie. redundant) - information that can be used to decide if a primer set is suitable to resolve a particular taxonomic group or not. 
+```groovy
+if (build_references) {
+    BUILD_REFERENCES()
+} else {
+    DATABASE()
+    BARBEQUE(DATABASE.out.db, DATABASE.out.versions, DATABASE.out.taxdump, DATABASE.out.accession_taxonomy)
+    if (interactive) INTERACTIVE_RESULTS
+}
+PIPELINE_COMPLETION()
+```
 
-The main use is in metabarcoding to test newly designed primers or check the suitability of a specific primer set for a given question (i.e. "can this be amplified with this particular primer?"). 
+## Benchmarking mode (default)
+
+This mode needs `--input` or `--primer_set`, plus `--dbs` or `--custom_db`.
+
+1. **Database:** `DATABASE` resolves the reference FASTAs and taxonomy. It then applies the
+   optional `--taxid` restriction, followed by the optional `--db_filter` cleaning.
+2. **Primers:** `--input` FASTAs and `--primer_set` downloads go through `PARSE_PRIMERS`. A
+   samplesheet is used as-is. `INPUT_CHECK` then validates the result. See
+   [primer_input.md](primer_input.md).
+3. **In-silico PCR:** `obipcr` runs once for each primer/database pair.
+4. **Filter:** for primer FASTA input, `FILTER_OBIPCR` drops amplicons that match only the merged
+   degenerate primer. Disable it with `--filter_collapsed_primers false`.
+5. **Parse:** amplicons are parsed into a TSV, with a MultiQC section. Pairs that produced no
+   amplicons are dropped with a warning.
+6. **Optional processing:** dereplication (`--dereplicate_amplicons`) and masking (`--mask`).
+7. **Clustering:** amplicons are clustered with `vsearch --cluster_fast` (`--cluster_id`), and each
+   cluster member is joined to its taxid.
+8. **Consensus:** each cluster gets a consensus taxon (`--consensus_fraction`).
+9. **Reports:**
+   - database taxonomic distribution
+   - optional target-taxon coverage (`--taxon`)
+   - a MultiQC report per primer/database pair, plus one combined report
+
+See [barbeque.md](barbeque.md) for the analysis steps in detail.
+
+## Reference installation mode
+
+`--build_references` skips the analysis. It installs the configured databases, the FooDMe2 primer
+FASTAs and, by default, the NCBI taxdump and accession-to-taxid mapping. Everything goes under:
+
+```text
+<reference_base>/barbeque/<reference_version>/
+```
+
+See [build_references.md](build_references.md).
+
+## Completion
+
+`PIPELINE_COMPLETION` always runs last and handles final bookkeeping.

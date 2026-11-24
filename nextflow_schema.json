@@ -10,17 +10,15 @@
       "type": "object",
       "fa_icon": "fas fa-terminal",
       "description": "Define where the pipeline should find input data and save output data.",
-      "required": ["input", "outdir"],
+      "required": [
+        "outdir"
+      ],
       "properties": {
         "input": {
           "type": "string",
-          "format": "file-path",
           "exists": true,
-          "schema": "assets/schema_input.json",
-          "mimetype": "text/csv",
-          "pattern": "^\\S+\\.csv$",
-          "description": "Path to comma-separated file containing information about the samples in the experiment.",
-          "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+          "description": "Path to a tab-separated primer samplesheet, a primer FASTA, or a directory of primer FASTA files. Alternative to --primer_set (mutually exclusive) - required unless --primer_set or --build_references is given.",
+          "help_text": "Provide a TSV samplesheet with primer, fwd, rev, min and max columns, a single .fa/.fasta/.fna primer FASTA, or a directory containing them. A file is read as FASTA or samplesheet based on its first non-blank line, not its extension. FASTA input requires --primer_min and --primer_max.",
           "fa_icon": "fas fa-file-csv"
         },
         "outdir": {
@@ -29,6 +27,13 @@
           "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
           "fa_icon": "fas fa-folder-open",
           "default": "results"
+        },
+        "teeliste": {
+          "type": "string",
+          "format": "file-path",
+          "exists": true,
+          "description": "Target-taxa TSV used by the interactive Tea List and Primer Evaluation pages",
+          "default": "res/teeliste.tsv"
         }
       }
     },
@@ -43,17 +48,90 @@
           "type": "boolean",
           "description": "Alternative workflow to install the references"
         },
+        "install_taxdump": {
+          "type": "boolean",
+          "description": "Install both the NCBI taxonomy dump and nucl_gb.accession2taxid during --build_references",
+          "default": true
+        },
+        "install_core_nt": {
+          "type": "boolean",
+          "description": "Install the NCBI core_nt BLAST database during --build_references",
+          "default": false
+        },
+
+        "primer_min": {
+          "type": "integer",
+          "description": "Global minimum amplicon length for --input primer FASTA input"
+        },
+        "primer_max": {
+          "type": "integer",
+          "description": "Global maximum amplicon length for --input primer FASTA input"
+        },
         "dbs": {
           "type": "string",
           "description": "A comma-separated list of pre-installed databases to benchmark against"
+        },
+        "taxid": {
+          "type": "integer",
+          "description": "Restrict --dbs/--custom_db to this taxid (and its descendants) before analysis, so only that taxon is analysed/checked"
+        },
+        "analysis_taxids": {
+          "type": ["string", "integer"],
+          "pattern": "^([0-9,]+|.+\\.txt)$",
+          "description": "Taxids (numbers only), comma-separated, e.g. 4442,4441, or a .txt file with one taxid per line"
+        },
+        "coverage_identity": {
+          "type": "number",
+          "description": "Coverage analysis: minimum % identity of a centroid hit on an analysis taxid record"
+        },
+        "coverage_query_cov": {
+          "type": "number",
+          "description": "Coverage analysis: minimum % of the centroid that one hit must cover"
+        },
+        "taxonomic_coverage_blast": {
+          "type": "boolean",
+          "description": "Search core_nt for centroid hits within the configured taxid"
+        },
+        "taxonomic_coverage_taxid": {
+          "type": "integer",
+          "description": "NCBI taxid used to restrict the core_nt centroid search, including descendants",
+          "default": 3398
+        },
+        "core_nt_db": {
+          "type": "string",
+          "description": "Path to the core_nt BLAST database prefix; overrides the database under --reference_base"
+        },
+        "taxonomic_coverage_identity": {
+          "type": "number",
+          "description": "Taxonomic coverage BLAST: minimum % identity of a centroid hit on a database record"
+        },
+        "taxonomic_coverage_query_cov": {
+          "type": "number",
+          "description": "Taxonomic coverage BLAST: minimum % of the centroid that one hit must cover"
         },
         "list_dbs": {
           "type": "boolean",
           "description": "List installed databases and exit"
         },
+        "primer_set": {
+          "type": "string",
+          "description": "A comma-separated list of named primer sets (from the bio-raum/FooDMe2 catalog) to use instead of --input"
+        },
+        "list_primers": {
+          "type": "boolean",
+          "description": "List available primer sets (as JSON) and exit"
+        },
         "reference_base": {
           "type": "string",
-          "description": "The base folder to which the references have been installed (only needed when running without site-specific config)"
+          "description": "The base folder to which the references have been installed "
+        },
+        "taxdump": {
+          "type": "string",
+          "description": "Path to a pre-installed NCBI taxdump directory. Overrides the default derived from --reference_base/--reference_version."
+        },
+        "accession_taxonomy": {
+          "type": "string",
+          "description": "Path to an accession2taxid/genbank2taxid mapping file. Overrides the default derived from --reference_base/--reference_version."
         },
         "run_name": {
           "type": "string",
@@ -61,13 +139,17 @@
         },
         "taxon": {
           "type": "string",
-          "description": "A valid taxonomic identifier (e.g. 'Mammalia') to perform in-depth analysis for"
+          "description": "A valid taxonomic identifier (e.g. 'Mammalia') to perform in-depth analysis to get the species coverage using ete"
+        },
+        "interactive": {
+          "type": "boolean",
+          "description": "Launch the Streamlit results dashboard (port 8501) after the run completes",
+          "default": false
         },
         "version": {
-          "type": "boolean",
+          "type": ["boolean", "string"],
           "description": "Display version and exit.",
-          "fa_icon": "fas fa-question-circle",
-          "hidden": true
+          "fa_icon": "fas fa-question-circle"
         }
       }
     },
@@ -77,21 +159,107 @@
       "description": "",
       "default": "",
       "properties": {
+        "mask": {
+          "type": "boolean",
+          "description": "Mask amplicons to simulate sequencing reads of --read_length (paired-end keeps both ends, --single_end truncates)",
+          "default": false
+        },
+        "single_end": {
+          "type": "boolean",
+          "description": "Specify if data is single-end",
+          "default": false
+        },
+        "read_length": {
+          "type": "integer",
+          "description": "Expected read length (default 400 for single end, 150 otherwise)"
+        },
         "custom_db": {
           "type": "string",
-          "description": "A custom database formatted with crabs 1.0.7 and above"
+          "description": "One or more custom nucleotide FASTA databases (.fasta, .fa, .fna) - a single file, a comma-separated list, or a glob"
         },
         "cluster_id": {
           "type": "number",
-          "default": 0.97,
-          "description": "The identity threshold to group barcode sequences by"
+          "default": 0.98,
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "VSEARCH --cluster_fast identity threshold used to group barcode sequences (set with --cluster_id)"
         },
-        "crabs_insilicopcr_options": {
+        "dereplicate_amplicons": {
+          "type": "boolean",
+          "default": false,
+          "description": "Dereplicate identical post-PCR amplicons before VSEARCH clustering"
+        },
+        "consensus_fraction": {
+          "type": "number",
+          "default": 1.0,
+          "exclusiveMinimum": 0.5,
+          "maximum": 1.0,
+          "description": "Minimum fraction of taxonomically assigned accessions in a cluster that must support a consensus assignment"
+        },
+        "db_filter_pattern": {
           "type": "string",
-          "description": "A set of custom options to pass to the in-silico PCR process"
+          "description": "Regex pattern for removing unwanted headers from selected databases",
+          "default": "synthetic|artificial|construct|recombinant|transgenic|unverified|low[ ._-]?quality|contaminant|chimeric|misidentified|environmental"
+        },
+        "db_filter_min_length": {
+          "type": "integer",
+          "description": "Minimum sequence length for database filtering",
+          "default": 50
+        },
+        "db_filter_max_length": {
+          "type": "integer",
+          "description": "Maximum sequence length for database filtering; no upper limit if not set"
+        },
+        "db_filter_max_n": {
+          "type": "integer",
+          "description": "Maximum number of IUPAC ambiguity bases allowed per sequence; not applied if not set"
+        },
+        "obipcr_mismatches": {
+          "type": "integer",
+          "description": "Number of mismatches allowed for obipcr",
+          "default": 2
+        },
+        "primer_site_not_found_mismatches": {
+          "type": "integer",
+          "description": "Primer-site diagnostic: maximum mismatches for a recognizable site; a candidate with more mismatches is classified PRIMER_SITE_NOT_FOUND",
+          "help_text": "This threshold is independent of --obipcr_mismatches and must be greater than or equal to it. With the defaults, 0-2 mismatches is BOUND, 3-4 is MISMATCH, and 5 or more is PRIMER_SITE_NOT_FOUND.",
+          "default": 4,
+          "minimum": 0
+        },
+        "primer_site_window": {
+          "type": "integer",
+          "description": "Primer-site diagnostic: bases searched on each side of the primer site predicted from the BLAST hit",
+          "help_text": "The predicted site is a guess when BLAST did not align the end of the barcode, because the record's unaligned part can be longer or shorter than the centroid's. In ITS2 the real site was up to 25 bp away, so the default searches 100 bp on each side.",
+          "default": 100,
+          "minimum": 0
+        },
+        "obipcr_fixed_3prime": {
+          "type": "integer",
+          "description": "Number of 3'-terminal bases of each primer that must match without mismatch, as in a real PCR. Applied by appending '#' to those bases in the obipcr primer. 0 disables the clamp",
+          "default": 3,
+          "minimum": 0
+        },
+        "obipcr_circular": {
+          "type": "boolean",
+          "description": "Treat database records as circular in obipcr (--circular), so amplicons crossing the start/end of a complete organelle genome are found",
+          "help_text": "Complete chloroplast and mitochondrial genomes are circular, but GenBank stores them as a linear string cut at an arbitrary point. An amplicon that crosses that cut is missed in linear mode. The option applies to every record in the database, including linear ones such as nuclear markers and partial gene sequences. For those, obipcr can join the end of the record to its start and report an amplicon that does not exist. This happens only when one primer site lies near the end of the record and the other near its start, within --max-length.",
+          "default": true
+        },
+        "filter_collapsed_primers": {
+          "type": "boolean",
+          "description": "Re-check obipcr amplicons against the original, uncollapsed primers and discard those only the combined degenerate primer could explain",
+          "help_text": "Primer FASTA input combines all forward primer variants into one IUPAC-degenerate forward primer and all reverse variants into one reverse primer. The combined primer also matches base combinations that no real primer has, so those amplicons are false positives. This filter keeps an amplicon only when both binding sites can be explained by at least one original primer, using the same mismatch budget as obipcr. Applies only when --input is a primer FASTA or a directory of them; it has no effect for a samplesheet or for --primer_set",
+          "default": true
+        },
+        "db_filter": {
+          "type": "boolean",
+          "description": "Apply header and sequence filtering to every selected database",
+          "default": false
         }
       },
-      "required": ["cluster_id"]
+      "required": [
+        "cluster_id"
+      ]
     }
   },
   "allOf": [
@@ -107,38 +275,26 @@
   ],
   "properties": {
     "reference_version": {
-      "type": "integer",
-      "default": 1,
-      "hidden": true
-    },
-    "plaintext_email": {
-      "type": "boolean",
-      "hidden": true
+      "type": "string",
+      "default": "1.1"
     },
     "midori_version": {
       "type": "string",
-      "default": "265_2025-03-08",
-      "hidden": true
+      "default": "271_2026-04-07"
     },
     "multiqc_config": {
-      "type": "string",
-      "default": "/home/mhoeppner/git/bio-raum/BarBeQuE/conf/multiqc_config.yaml",
-      "hidden": true
+      "type": "string"
     },
     "multiqc_logo": {
-      "type": "string",
-      "default": "/home/mhoeppner/git/bio-raum/BarBeQuE/assets/pipelinelogo.png",
-      "hidden": true
+      "type": "string"
     },
     "publish_dir_mode": {
       "type": "string",
-      "default": "copy",
-      "hidden": true
+      "default": "copy"
     },
     "custom_config_base": {
       "type": "string",
-      "default": "https://raw.githubusercontent.com/bio-raum/nf-configs/main",
-      "hidden": true
+      "default": "https://raw.githubusercontent.com/bio-raum/nf-configs/main"
     }
   }
 }

@@ -1,0 +1,8 @@
+name: cluster_consensus_reporting
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coreutils
+  - python=3.12
+  - sed

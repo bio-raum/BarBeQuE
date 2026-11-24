@@ -1,38 +1,95 @@
-title: "BarBeQue report"
-subtitle: "Characterization of primers for metabarcoding"
+title: "BarBeQuE report"
+subtitle: "BARcode BEnchmarking and QUality Evaluation"
+
 custom_logo: "pipelinelogo.png"
-custom_logo_title: "BarBeQue"
-custom_logo_url: "http://www.github.com/bio-raum/BarBeQue"
-skip_versions_section: true
+custom_logo_title: "BarBeQuE"
+custom_logo_url: "https://github.com/bio-raum/BarBeQuE"
+
+skip_versions_section: false
+log_filesize_limit: 100000000
+
+versions_table_group_header: "Module"
 
 extra_fn_clean_exts:
-    - _R1
-    - _R2
-    - _duplicate_metrics.txt
-    - .pass
+  - _R1
+  - _R2
+  - _duplicate_metrics.txt
+  - .pass
 
-custom_data:
-    amplicon_mean_size:
-        headers:
-            Mean amplicon length:
-                description: 'Mean length of the amplified sequences'
-                format: '{:,.0f}'
-            Stddev:
-                description: 'Standard deviation'
-            Database coverage:
-                description: 'Fraction of database entries amplifiable'
-            Database size:
-                description: 'Total number of database entries'
-                format: '{:,.0f}'
 report_comment: >
-    This report has been generated automatically by bio-raum/BarBeQue.
-    For help interpreting the outputs, please see: https://github.com/bio-raum/BarBeQue
+  This report has been generated automatically by bio-raum/BarBeQuE.
+
 report_header_info:
-    - Application Type: "Metabarcoding"
+  - Application Type: "Metabarcoding"
 
 top_modules:
-    - 'general_stats'
+  - "general_stats"
 
+# Taxonomic coverage BLAST: the module writes a plain table, MultiQC shows it with these settings
+custom_data:
+  taxonomic_coverage_blast:
+    section_name: "Taxonomic Coverage (BLAST)"
+    description: "Distinct core_nt accessions hit by the centroids within the configured taxid and its descendants"
+    plot_type: "table"
+sp:
+  taxonomic_coverage_blast:
+    fn: "*.coverage_blast.tsv"
+
+# Higher parent/module numbers are placed higher in the report. Section numbers
+# within each parent are listed in ascending order.
 report_section_order:
-    software_versions:
-        order: -1001
+  # Sample sheet (primers and their amplicon length bounds) at the very top
+  samplesheet:
+    order: 200000
+
+  # Analysis groups follow their module order in workflows/barbeque.nf
+  obipcr:
+    order: 100000
+
+  build_db_taxids:
+    order: 90000
+
+  cluster_consensus:
+    order: 80000
+
+  taxonomic_coverage:
+    order: 70000
+
+  # OBI-PCR sections, first to last
+  obipcr_summary:
+    order: 100
+  obipcr_amplicon_recovery:
+    order: 200
+  obipcr_gc:
+    order: 300
+  obipcr_errors:
+    order: 400
+  obipcr_positions:
+    order: 500
+  obipcr_amplicon_lengths:
+    order: 600
+  obipcr_amplicon_gc:
+    order: 700
+
+  # Cluster consensus sections, first to last
+  cluster_consensus_summary:
+    order: 100
+  cluster_consensus_resolution:
+    order: 200
+  cluster_consensus_size:
+    order: 300
+  taxon_search:
+    order: 400
+
+  # Taxonomic coverage sections, first to last
+  taxonomic_coverage_summary:
+    order: 100
+  taxonomic_coverage_details:
+    order: 200
+
+  # Settings used for the run, just above the software versions at the bottom
+  barbeque_settings:
+    order: -1000
+
+  software_versions:
+    order: -1001

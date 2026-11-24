@@ -1,0 +1,7 @@
+name: extract_analysis_taxids
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - taxonkit
+  - seqkit

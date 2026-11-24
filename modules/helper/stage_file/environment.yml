@@ -1,7 +1,5 @@
 name: stage_file
 channels:
   - conda-forge
-  - bioconda
-  
 dependencies:
-  - bioconda::multiqc=1.23
+  - coreutils
